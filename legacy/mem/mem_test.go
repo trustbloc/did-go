@@ -11,10 +11,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	storagetest "github.com/hyperledger/aries-framework-go/test/component/storage"
 	spi "github.com/trustbloc/kms-crypto-go/spi/storage"
 
-	"github.com/trustbloc/vc-go/legacy/mem"
+	storagetest "github.com/trustbloc/did-go/legacy/test/component/storage"
+
+	"github.com/trustbloc/did-go/legacy/mem"
 )
 
 func TestCommon(t *testing.T) {
