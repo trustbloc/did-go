@@ -15,9 +15,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/trustbloc/kms-crypto-go/crypto/primitive/bbs12381g2pub"
-	"github.com/trustbloc/kms-crypto-go/doc/jose/jwk"
-	"github.com/trustbloc/kms-crypto-go/doc/jose/jwk/jwksupport"
+	"github.com/trustbloc/kms-go/crypto/primitive/bbs12381g2pub"
+	"github.com/trustbloc/kms-go/doc/jose/jwk"
+	"github.com/trustbloc/kms-go/doc/jose/jwk/jwksupport"
 	"github.com/trustbloc/sidetree-core-go/pkg/document"
 	ariesdid "github.com/trustbloc/vc-go/did"
 	model "github.com/trustbloc/vc-go/did/endpoint"

@@ -12,7 +12,7 @@ package httpbinding
 import (
 	"strings"
 
-	"github.com/trustbloc/kms-crypto-go/doc/util/fingerprint"
+	"github.com/trustbloc/kms-go/doc/util/fingerprint"
 	diddoc "github.com/trustbloc/vc-go/did"
 )
 

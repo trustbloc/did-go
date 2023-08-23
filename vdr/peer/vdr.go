@@ -9,7 +9,7 @@ package peer
 import (
 	"fmt"
 
-	"github.com/trustbloc/kms-crypto-go/spi/storage"
+	"github.com/trustbloc/kms-go/spi/storage"
 	diddoc "github.com/trustbloc/vc-go/did"
 	vdrspi "github.com/trustbloc/vc-go/spi/vdr"
 )

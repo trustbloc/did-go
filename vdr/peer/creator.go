@@ -14,7 +14,7 @@ import (
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/google/uuid"
 
-	"github.com/trustbloc/kms-crypto-go/doc/util/fingerprint"
+	"github.com/trustbloc/kms-go/doc/util/fingerprint"
 	"github.com/trustbloc/vc-go/did"
 	"github.com/trustbloc/vc-go/did/endpoint"
 	vdrspi "github.com/trustbloc/vc-go/spi/vdr"

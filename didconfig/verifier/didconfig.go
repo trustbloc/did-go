@@ -13,7 +13,7 @@ import (
 	"net/url"
 
 	jsonld "github.com/piprate/json-gold/ld"
-	"github.com/trustbloc/kms-crypto-go/doc/jose"
+	"github.com/trustbloc/kms-go/doc/jose"
 	"github.com/trustbloc/vc-go/jwt"
 	"github.com/trustbloc/vc-go/verifiable"
 

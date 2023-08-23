@@ -20,7 +20,7 @@ import (
 	"github.com/btcsuite/btcutil/base58"
 	gojose "github.com/go-jose/go-jose/v3"
 	"github.com/stretchr/testify/require"
-	"github.com/trustbloc/kms-crypto-go/doc/jose/jwk"
+	"github.com/trustbloc/kms-go/doc/jose/jwk"
 	"github.com/trustbloc/sidetree-core-go/pkg/commitment"
 	"github.com/trustbloc/sidetree-core-go/pkg/jws"
 	"github.com/trustbloc/sidetree-core-go/pkg/util/ecsigner"
