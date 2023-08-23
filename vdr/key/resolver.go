@@ -12,8 +12,8 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/trustbloc/kms-crypto-go/doc/jose/jwk/jwksupport"
-	"github.com/trustbloc/kms-crypto-go/doc/util/fingerprint"
+	"github.com/trustbloc/kms-go/doc/jose/jwk/jwksupport"
+	"github.com/trustbloc/kms-go/doc/util/fingerprint"
 	"github.com/trustbloc/vc-go/did"
 	vdrspi "github.com/trustbloc/vc-go/spi/vdr"
 )

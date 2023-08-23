@@ -13,7 +13,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/trustbloc/kms-crypto-go/spi/storage"
+	"github.com/trustbloc/kms-go/spi/storage"
 	"github.com/trustbloc/vc-go/did"
 
 	vdrapi "github.com/trustbloc/did-go/vdr/api"

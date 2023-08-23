@@ -15,12 +15,12 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/trustbloc/kms-crypto-go/crypto/tinkcrypto"
-	"github.com/trustbloc/kms-crypto-go/doc/jose"
-	"github.com/trustbloc/kms-crypto-go/kms/localkms"
-	mockkms "github.com/trustbloc/kms-crypto-go/mock/kms"
-	"github.com/trustbloc/kms-crypto-go/secretlock/noop"
-	"github.com/trustbloc/kms-crypto-go/spi/kms"
+	"github.com/trustbloc/kms-go/crypto/tinkcrypto"
+	"github.com/trustbloc/kms-go/doc/jose"
+	"github.com/trustbloc/kms-go/kms/localkms"
+	mockkms "github.com/trustbloc/kms-go/mock/kms"
+	"github.com/trustbloc/kms-go/secretlock/noop"
+	"github.com/trustbloc/kms-go/spi/kms"
 	afgjwt "github.com/trustbloc/vc-go/jwt"
 	ldcontext "github.com/trustbloc/vc-go/ld/context"
 	ldtestutil "github.com/trustbloc/vc-go/ld/testutil"

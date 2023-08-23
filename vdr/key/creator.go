@@ -10,8 +10,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/trustbloc/kms-crypto-go/doc/util/fingerprint"
-	"github.com/trustbloc/kms-crypto-go/util/cryptoutil"
+	"github.com/trustbloc/kms-go/doc/util/fingerprint"
+	"github.com/trustbloc/kms-go/util/cryptoutil"
 	"github.com/trustbloc/vc-go/did"
 	vdrspi "github.com/trustbloc/vc-go/spi/vdr"
 )
