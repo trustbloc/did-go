@@ -4,7 +4,7 @@
 
 module github.com/trustbloc/did-go
 
-go 1.20
+go 1.21
 
 require (
 	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
@@ -16,7 +16,7 @@ require (
 	github.com/multiformats/go-multihash v0.0.14
 	github.com/piprate/json-gold v0.5.1-0.20230111113000-6ddbe6e6f19f
 	github.com/stretchr/testify v1.8.1
-	github.com/trustbloc/kms-go v0.0.0-20230823163616-c9310a484f40
+	github.com/trustbloc/kms-go v0.0.0-20230824183646-318214f7c333
 	github.com/trustbloc/sidetree-core-go v1.0.0
 	github.com/trustbloc/vc-go v0.0.0-20230823173222-60db5cb83715
 )
