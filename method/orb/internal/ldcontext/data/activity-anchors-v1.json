@@ -1,0 +1,48 @@
+{
+  "url": "https://w3id.org/activityanchors/v1",
+  "content": {
+    "@context": {
+      "@version": 1.1,
+      "@protected": true,
+      "AnchorEvent": {
+        "@id": "https://w3id.org/activityanchors#AnchorEvent",
+        "@context": {
+          "@version": 1.1,
+          "@protected": true,
+          "id": "@id",
+          "type": "@type"
+        }
+      },
+      "AnchorReceipt": {
+        "@id": "https://w3id.org/activityanchors#AnchorReceipt",
+        "@context": {
+          "@version": 1.1,
+          "@protected": true,
+          "id": "@id",
+          "type": "@type"
+        }
+      },
+      "AnchorCredential": {
+        "@id": "https://w3id.org/activityanchors#AnchorCredential",
+        "@context": {
+          "@version": 1.1,
+          "@protected": true,
+          "id": "@id",
+          "type": "@type"
+        }
+      },
+      "AnchorLink": {
+        "@id": "https://w3id.org/activityanchors#AnchorLink",
+        "@context": {
+          "@version": 1.1,
+          "@protected": true,
+          "type": "@type",
+          "href": "https://w3id.org/activityanchors#href",
+          "anchor": "https://w3id.org/activityanchors#anchor",
+          "profile": "https://w3id.org/activityanchors#profile",
+          "rel": "https://w3id.org/activityanchors#rel"
+        }
+      }
+    }
+  }
+}
