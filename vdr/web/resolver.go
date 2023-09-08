@@ -10,9 +10,10 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
 
-	"github.com/hyperledger/aries-framework-go/component/log"
 	"github.com/trustbloc/vc-go/did"
 	vdrspi "github.com/trustbloc/vc-go/spi/vdr"
 )
@@ -25,7 +26,7 @@ const (
 	UseHTTPOpt = "useHTTP"
 )
 
-var logger = log.New("aries-framework/pkg/vdr/web")
+var errorLogger = log.New(os.Stderr, " [did-go/vdr/web] ", log.Ldate|log.Ltime|log.LUTC)
 
 // Read resolves a did:web did.
 func (v *VDR) Read(didID string, opts ...vdrspi.DIDMethodOption) (*did.DocResolution, error) {
@@ -85,6 +86,6 @@ func (v *VDR) Read(didID string, opts ...vdrspi.DIDMethodOption) (*did.DocResolu
 func closeResponseBody(respBody io.Closer) {
 	e := respBody.Close()
 	if e != nil {
-		logger.Errorf("Failed to close response body: %v", e)
+		errorLogger.Printf("Failed to close response body: %v", e)
 	}
 }

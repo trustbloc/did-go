@@ -10,17 +10,16 @@ require (
 	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
 	github.com/go-jose/go-jose/v3 v3.0.1-0.20221117193127-916db76e8214
 	github.com/google/uuid v1.3.0
-	github.com/hyperledger/aries-framework-go/component/log v0.0.0-20230615141038-5d444d6c36de
 	github.com/jinzhu/copier v0.0.0-20190924061706-b57f9002281a
 	github.com/multiformats/go-multibase v0.1.1
 	github.com/multiformats/go-multihash v0.0.14
 	github.com/opentracing/opentracing-go v1.1.0
 	github.com/piprate/json-gold v0.5.1-0.20230111113000-6ddbe6e6f19f
 	github.com/stretchr/testify v1.8.2
-	github.com/trustbloc/kms-go v0.0.0-20230824183646-318214f7c333
+	github.com/trustbloc/kms-go v0.0.0-20230906134914-b9afaf3b793d
 	github.com/trustbloc/orb v1.0.0-rc7
 	github.com/trustbloc/sidetree-core-go v1.0.0
-	github.com/trustbloc/vc-go v0.0.0-20230823173222-60db5cb83715
+	github.com/trustbloc/vc-go v0.0.0-20230907141321-b2c52f023fe9
 	golang.org/x/net v0.1.0
 )
 

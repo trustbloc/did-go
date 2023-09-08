@@ -13,10 +13,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
+	"os"
 	"strings"
 
-	"github.com/hyperledger/aries-framework-go/component/log"
 	"github.com/trustbloc/sidetree-core-go/pkg/commitment"
 	"github.com/trustbloc/sidetree-core-go/pkg/hashing"
 	"github.com/trustbloc/sidetree-core-go/pkg/patch"
@@ -33,9 +34,16 @@ import (
 
 const (
 	defaultHashAlgorithm = 18
+	logPrefix            = " [did-go/method/sidetree] "
 )
 
-var logger = log.New("aries-framework-ext/vdr/sidetree/client") //nolint: gochecknoglobals
+var errorLogger = log.New(os.Stderr, logPrefix, log.Ldate|log.Ltime|log.LUTC)
+var debugLogger = log.New(io.Discard, logPrefix, log.Ldate|log.Ltime|log.LUTC)
+
+// SetDebugOutput is used to set output of debug logs.
+func SetDebugOutput(out io.Writer) {
+	debugLogger.SetOutput(out)
+}
 
 type authTokenProvider interface {
 	AuthToken() (string, error)
@@ -95,7 +103,7 @@ func (c *Client) CreateDID(opts ...create.Option) (*docdid.DocResolution, error)
 			return nil, fmt.Errorf("failed to parse document resolution: %w", err)
 		}
 
-		logger.Warnf("failed to parse document resolution %w", err)
+		errorLogger.Printf("failed to parse document resolution %v", err)
 	} else {
 		return documentResolution, nil
 	}
@@ -426,7 +434,7 @@ func (c *Client) defaultSendRequest(req []byte, getEndpoints GetEndpointsFunc) (
 
 	responseBytes, err := c.doSendRequest(req, getEndpoints, false)
 	if err != nil {
-		logger.Warnf("Error sending request. Trying again with endpoint cache disabled.: %s", err)
+		errorLogger.Printf("Error sending request. Trying again with endpoint cache disabled.: %s", err)
 
 		responseBytes, err = c.doSendRequest(req, getEndpoints, true)
 		if err != nil {
@@ -443,7 +451,7 @@ func (c *Client) doSendRequest(req []byte, getEndpoints GetEndpointsFunc, disabl
 		return nil, fmt.Errorf("sidetree get endpoints: %w", err)
 	}
 
-	logger.Debugf("Got sidetree endpoints: %s", endpoints)
+	debugLogger.Printf("Got sidetree endpoints: %s", endpoints)
 
 	// TODO add logic for using different sidetree endpoint
 	// for now will use the first one
@@ -655,6 +663,6 @@ func getCommitment(multiHashAlgorithm uint, recoverDIDOpts *recovery.Opts) (next
 func closeResponseBody(respBody io.Closer) {
 	e := respBody.Close()
 	if e != nil {
-		logger.Errorf("Failed to close response body: %v", e)
+		errorLogger.Printf("Failed to close response body: %v", e)
 	}
 }

@@ -7,6 +7,7 @@ package rollingcounter_test
 
 import (
 	"math/rand"
+	"strings"
 	"sync"
 	"testing"
 
@@ -54,4 +55,14 @@ func TestCounter(t *testing.T) {
 			}()
 		}
 	})
+}
+
+func TestSetDebugOutput(t *testing.T) {
+	output := &strings.Builder{}
+	rollingcounter.SetDebugOutput(output)
+	counter := rollingcounter.New()
+
+	n := 10
+	counter.Next(n)
+	require.Contains(t, output.String(), "Set the counter to")
 }

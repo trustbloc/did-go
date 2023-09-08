@@ -15,16 +15,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
 	"github.com/btcsuite/btcutil/base58"
-	"github.com/hyperledger/aries-framework-go/component/log"
 	jsonld "github.com/piprate/json-gold/ld"
-	"github.com/trustbloc/did-go/legacy/mem"
-	vdrapi "github.com/trustbloc/did-go/vdr/api"
-	"github.com/trustbloc/did-go/vdr/httpbinding"
 	"github.com/trustbloc/orb/pkg/discovery/endpoint/client"
 	"github.com/trustbloc/orb/pkg/discovery/endpoint/client/models"
 	"github.com/trustbloc/orb/pkg/hashlink"
@@ -37,6 +35,10 @@ import (
 	ldprocessor "github.com/trustbloc/vc-go/ld/processor"
 	ldstore "github.com/trustbloc/vc-go/ld/store"
 	"golang.org/x/net/http2"
+
+	"github.com/trustbloc/did-go/legacy/mem"
+	vdrapi "github.com/trustbloc/did-go/vdr/api"
+	"github.com/trustbloc/did-go/vdr/httpbinding"
 
 	"github.com/trustbloc/did-go/method/orb/internal/ldcontext"
 	"github.com/trustbloc/did-go/method/orb/lb"
@@ -84,9 +86,16 @@ const (
 	httpsProtocol  = "https"
 	httpProtocol   = "http"
 	maxRetries     = 3
+	logPrefix      = " [did-go/method/orb] "
 )
 
-var logger = log.New("aries-framework-ext/vdr/orb") //nolint: gochecknoglobals
+var errorLogger = log.New(os.Stderr, logPrefix, log.Ldate|log.Ltime|log.LUTC)
+var debugLogger = log.New(io.Discard, logPrefix, log.Ldate|log.Ltime|log.LUTC)
+
+// SetDebugOutput is used to set output of debug logs.
+func SetDebugOutput(out io.Writer) {
+	debugLogger.SetOutput(out)
+}
 
 // OperationType operation type.
 type OperationType int
@@ -420,7 +429,7 @@ func (v *VDR) Read(did string, opts ...vdrapi.DIDMethodOption) (*docdid.DocResol
 		strings.HasPrefix(did, fmt.Sprintf("did:%s:%s", DIDMethod, httpProtocol)):
 		hintDomain := strings.Split(did, ":")[3]
 
-		logger.Debugf("Resolving DID with HTTP hint: %s", did)
+		debugLogger.Printf("Resolving DID with HTTP hint: %s", did)
 
 		endpoint, err = v.discoveryService.GetEndpoint(
 			fmt.Sprintf("%s://%s", strings.Split(did, ":")[2], hintDomain))
@@ -445,11 +454,11 @@ func (v *VDR) Read(did string, opts ...vdrapi.DIDMethodOption) (*docdid.DocResol
 
 		return nil, fmt.Errorf("discovery did not return hint domain")
 	case len(v.domains) != 0:
-		logger.Debugf("Resolving DID from one of %d domains: %s", len(v.domains), did)
+		debugLogger.Printf("Resolving DID from one of %d domains: %s", len(v.domains), did)
 
 		return v.resolveFromDomains(ctx, did, opts...)
 	default:
-		logger.Debugf("Resolving DID from anchor origin: %s", did)
+		debugLogger.Printf("Resolving DID from anchor origin: %s", did)
 
 		endpoint, err = v.discoveryService.GetEndpointFromAnchorOrigin(did)
 		if err != nil {
@@ -471,7 +480,7 @@ func (v *VDR) resolveFromDomains(ctx context.Context, did string,
 
 	var errCause error
 
-	logger.Debugf("Resolving DID from one of the %d domains: %s", len(v.domains), did)
+	debugLogger.Printf("Resolving DID from one of the %d domains: %s", len(v.domains), did)
 
 	for i := 1; i <= resolveDIDRetry.MaxNumber; i++ {
 		docResolution, err := v.resolveFromRandomDomain(ctx, did, opts...)
@@ -485,7 +494,7 @@ func (v *VDR) resolveFromDomains(ctx context.Context, did string,
 
 		errCause = err
 
-		logger.Infof("Error resolving DID on attempt %d of %d. Retrying on another node - %s: %s",
+		debugLogger.Printf("Error resolving DID on attempt %d of %d. Retrying on another node - %s: %s",
 			i, resolveDIDRetry.MaxNumber, did, err)
 
 		resolveDIDRetry.sleep()
@@ -501,7 +510,7 @@ func (v *VDR) resolveFromRandomDomain(ctx context.Context, did string,
 		return nil, err
 	}
 
-	logger.Debugf("Resolving DID from %s: %s", domain, did)
+	debugLogger.Printf("Resolving DID from %s: %s", domain, did)
 
 	endpoint, err := v.discoveryService.GetEndpoint(domain)
 	if err != nil {
@@ -529,7 +538,7 @@ func (v *VDR) resolveFromEndpoint(ctx context.Context, endpoint *models.Endpoint
 	// In case of a mismatch, additional links may need to be chosen until the client has n matches.
 
 	for _, e := range endpoint.ResolutionEndpoints {
-		logger.Debugf("Resolving DID from endpoint %s: %s", e, did)
+		debugLogger.Printf("Resolving DID from endpoint %s: %s", e, did)
 
 		resp, err := v.sidetreeResolve(ctx, e, did, opts...)
 		if err != nil {
@@ -542,7 +551,7 @@ func (v *VDR) resolveFromEndpoint(ctx context.Context, endpoint *models.Endpoint
 		}
 
 		if docResolution != nil && !bytes.Equal(docBytes, respBytes) {
-			logger.Warnf("Mismatch in document contents for DID %s. Doc 1: %s, Doc 2: %s",
+			errorLogger.Printf("Mismatch in document contents for DID %s. Doc 1: %s, Doc 2: %s",
 				did, string(docBytes), string(respBytes))
 
 			continue
@@ -1179,7 +1188,7 @@ func (v *VDR) getEndpoints(preferredDomain string, retryOnOtherDomains bool, did
 		return nil, err
 	}
 
-	logger.Warnf("Failed to get endpoints from preferred domain %s. will choose random domain: %s",
+	errorLogger.Printf("Failed to get endpoints from preferred domain %s. will choose random domain: %s",
 		preferredDomain, err)
 
 	return v.getEndpointsFromRandomDomain(didMethodOpts, resolveEndpoint)
@@ -1205,7 +1214,7 @@ func (v *VDR) getEndpointsFromRandomDomain(didMethodOpts *vdrapi.DIDMethodOpts,
 			return domainEndpoint.OperationEndpoints, nil
 		}
 
-		logger.Warnf("Failed to get endpoints from %s on attempt #%d of %d. Will choose another domain: %s",
+		errorLogger.Printf("Failed to get endpoints from %s on attempt #%d of %d. Will choose another domain: %s",
 			domain, i, retryOptions.MaxNumber, err)
 
 		lastErr = err
@@ -1438,7 +1447,7 @@ func send(httpClient httpClient, req []byte, method, endpointURL, token string, 
 func closeResponseBody(respBody io.Closer) {
 	e := respBody.Close()
 	if e != nil {
-		logger.Errorf("Failed to close response body: %v", e)
+		errorLogger.Printf("Failed to close response body: %v", e)
 	}
 }
 
