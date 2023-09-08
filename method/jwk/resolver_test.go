@@ -13,8 +13,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/trustbloc/sidetree-core-go/pkg/canonicalizer"
-	"github.com/trustbloc/vc-go/did"
 
+	"github.com/trustbloc/did-go/doc/did"
 	"github.com/trustbloc/did-go/method/jwk"
 )
 

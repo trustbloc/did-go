@@ -11,10 +11,8 @@ import (
 	"crypto/rand"
 	"time"
 
-	"github.com/trustbloc/vc-go/did"
-	"github.com/trustbloc/vc-go/did/endpoint"
-	vdrspi "github.com/trustbloc/vc-go/spi/vdr"
-
+	"github.com/trustbloc/did-go/doc/did"
+	"github.com/trustbloc/did-go/doc/did/endpoint"
 	vdrapi "github.com/trustbloc/did-go/vdr/api"
 )
 
@@ -23,17 +21,17 @@ import (
 type VDRegistry struct {
 	CreateErr      error
 	CreateValue    *did.Doc
-	CreateFunc     func(string, *did.Doc, ...vdrspi.DIDMethodOption) (*did.DocResolution, error)
-	UpdateFunc     func(didDoc *did.Doc, opts ...vdrspi.DIDMethodOption) error
-	DeactivateFunc func(did string, opts ...vdrspi.DIDMethodOption) error
+	CreateFunc     func(string, *did.Doc, ...vdrapi.DIDMethodOption) (*did.DocResolution, error)
+	UpdateFunc     func(didDoc *did.Doc, opts ...vdrapi.DIDMethodOption) error
+	DeactivateFunc func(did string, opts ...vdrapi.DIDMethodOption) error
 	ResolveErr     error
 	ResolveValue   *did.Doc
-	ResolveFunc    func(didID string, opts ...vdrspi.DIDMethodOption) (*did.DocResolution, error)
+	ResolveFunc    func(didID string, opts ...vdrapi.DIDMethodOption) (*did.DocResolution, error)
 }
 
 // Create mock implementation of create DID.
 func (m *VDRegistry) Create(method string, didDoc *did.Doc,
-	opts ...vdrspi.DIDMethodOption) (*did.DocResolution, error) {
+	opts ...vdrapi.DIDMethodOption) (*did.DocResolution, error) {
 	if m.CreateErr != nil {
 		return nil, m.CreateErr
 	}
@@ -51,7 +49,7 @@ func (m *VDRegistry) Create(method string, didDoc *did.Doc,
 }
 
 // Resolve did document.
-func (m *VDRegistry) Resolve(didID string, opts ...vdrspi.DIDMethodOption) (*did.DocResolution, error) {
+func (m *VDRegistry) Resolve(didID string, opts ...vdrapi.DIDMethodOption) (*did.DocResolution, error) {
 	if m.ResolveFunc != nil {
 		return m.ResolveFunc(didID, opts...)
 	}
@@ -68,7 +66,7 @@ func (m *VDRegistry) Resolve(didID string, opts ...vdrspi.DIDMethodOption) (*did
 }
 
 // Update did.
-func (m *VDRegistry) Update(didDoc *did.Doc, opts ...vdrspi.DIDMethodOption) error {
+func (m *VDRegistry) Update(didDoc *did.Doc, opts ...vdrapi.DIDMethodOption) error {
 	if m.UpdateFunc != nil {
 		return m.UpdateFunc(didDoc, opts...)
 	}
@@ -77,7 +75,7 @@ func (m *VDRegistry) Update(didDoc *did.Doc, opts ...vdrspi.DIDMethodOption) err
 }
 
 // Deactivate did.
-func (m *VDRegistry) Deactivate(didID string, opts ...vdrspi.DIDMethodOption) error {
+func (m *VDRegistry) Deactivate(didID string, opts ...vdrapi.DIDMethodOption) error {
 	if m.DeactivateFunc != nil {
 		return m.DeactivateFunc(didID, opts...)
 	}

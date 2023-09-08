@@ -9,8 +9,7 @@ package recovery
 import (
 	"crypto"
 
-	docdid "github.com/trustbloc/vc-go/did"
-
+	docdid "github.com/trustbloc/did-go/doc/did"
 	"github.com/trustbloc/did-go/method/sidetree/api"
 	"github.com/trustbloc/did-go/method/sidetree/doc"
 )

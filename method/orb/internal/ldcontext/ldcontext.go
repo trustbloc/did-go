@@ -12,7 +12,7 @@ import (
 	"os"
 	"sync"
 
-	ldcontext "github.com/trustbloc/vc-go/ld/context"
+	ldcontext "github.com/trustbloc/did-go/doc/ld/context"
 )
 
 const dataDir = "data"
@@ -22,7 +22,7 @@ var (
 	fs embed.FS
 
 	contexts []ldcontext.Document //nolint: gochecknoglobals
-	once     sync.Once //nolint: gochecknoglobals
+	once     sync.Once            //nolint: gochecknoglobals
 	errOnce  error
 ) //nolint: gochecknoglobals
 

@@ -12,9 +12,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/trustbloc/vc-go/did"
-	vdrspi "github.com/trustbloc/vc-go/spi/vdr"
-
+	"github.com/trustbloc/did-go/doc/did"
 	vdrapi "github.com/trustbloc/did-go/vdr/api"
 	mockvdr "github.com/trustbloc/did-go/vdr/mock"
 )
@@ -66,7 +64,7 @@ func TestRegistry_Resolve(t *testing.T) {
 
 	t.Run("test DID not found", func(t *testing.T) {
 		registry := New(WithVDR(&mockvdr.VDR{
-			AcceptValue: true, ReadFunc: func(didID string, opts ...vdrspi.DIDMethodOption) (*did.DocResolution, error) {
+			AcceptValue: true, ReadFunc: func(didID string, opts ...vdrapi.DIDMethodOption) (*did.DocResolution, error) {
 				return nil, vdrapi.ErrNotFound
 			},
 		}))
@@ -78,7 +76,7 @@ func TestRegistry_Resolve(t *testing.T) {
 
 	t.Run("test error from resolve did", func(t *testing.T) {
 		registry := New(WithVDR(&mockvdr.VDR{
-			AcceptValue: true, ReadFunc: func(didID string, opts ...vdrspi.DIDMethodOption) (*did.DocResolution, error) {
+			AcceptValue: true, ReadFunc: func(didID string, opts ...vdrapi.DIDMethodOption) (*did.DocResolution, error) {
 				return nil, fmt.Errorf("read error")
 			},
 		}))
@@ -90,8 +88,8 @@ func TestRegistry_Resolve(t *testing.T) {
 
 	t.Run("test opts passed", func(t *testing.T) {
 		registry := New(WithVDR(&mockvdr.VDR{
-			AcceptValue: true, ReadFunc: func(didID string, opts ...vdrspi.DIDMethodOption) (*did.DocResolution, error) {
-				didOpts := &vdrspi.DIDMethodOpts{Values: make(map[string]interface{})}
+			AcceptValue: true, ReadFunc: func(didID string, opts ...vdrapi.DIDMethodOption) (*did.DocResolution, error) {
+				didOpts := &vdrapi.DIDMethodOpts{Values: make(map[string]interface{})}
 				// Apply options
 				for _, opt := range opts {
 					opt(didOpts)
@@ -101,14 +99,14 @@ func TestRegistry_Resolve(t *testing.T) {
 				return nil, nil
 			},
 		}))
-		_, err := registry.Resolve("1:id:123", vdrspi.WithOption("k1", "v1"))
+		_, err := registry.Resolve("1:id:123", vdrapi.WithOption("k1", "v1"))
 		require.NoError(t, err)
 	})
 
 	t.Run("test opts passed to accept", func(t *testing.T) {
 		registry := New(WithVDR(&mockvdr.VDR{
-			AcceptFunc: func(method string, opts ...vdrspi.DIDMethodOption) bool {
-				acceptOpts := &vdrspi.DIDMethodOpts{Values: make(map[string]interface{})}
+			AcceptFunc: func(method string, opts ...vdrapi.DIDMethodOption) bool {
+				acceptOpts := &vdrapi.DIDMethodOpts{Values: make(map[string]interface{})}
 				// Apply options
 				for _, opt := range opts {
 					opt(acceptOpts)
@@ -119,7 +117,7 @@ func TestRegistry_Resolve(t *testing.T) {
 				return true
 			},
 		}))
-		_, err := registry.Resolve("1:id:123", vdrspi.WithOption("k1", "v1"))
+		_, err := registry.Resolve("1:id:123", vdrapi.WithOption("k1", "v1"))
 		require.NoError(t, err)
 	})
 
@@ -147,7 +145,7 @@ func TestRegistry_Update(t *testing.T) {
 
 	t.Run("test error from update did", func(t *testing.T) {
 		registry := New(WithVDR(&mockvdr.VDR{
-			AcceptValue: true, UpdateFunc: func(didDoc *did.Doc, opts ...vdrspi.DIDMethodOption) error {
+			AcceptValue: true, UpdateFunc: func(didDoc *did.Doc, opts ...vdrapi.DIDMethodOption) error {
 				return fmt.Errorf("update error")
 			},
 		}))
@@ -158,8 +156,8 @@ func TestRegistry_Update(t *testing.T) {
 
 	t.Run("test opts passed", func(t *testing.T) {
 		registry := New(WithVDR(&mockvdr.VDR{
-			AcceptValue: true, UpdateFunc: func(didDoc *did.Doc, opts ...vdrspi.DIDMethodOption) error {
-				didOpts := &vdrspi.DIDMethodOpts{Values: make(map[string]interface{})}
+			AcceptValue: true, UpdateFunc: func(didDoc *did.Doc, opts ...vdrapi.DIDMethodOption) error {
+				didOpts := &vdrapi.DIDMethodOpts{Values: make(map[string]interface{})}
 				// Apply options
 				for _, opt := range opts {
 					opt(didOpts)
@@ -170,14 +168,14 @@ func TestRegistry_Update(t *testing.T) {
 			},
 		}))
 
-		err := registry.Update(&did.Doc{ID: "1:id:123"}, vdrspi.WithOption("k1", "v1"))
+		err := registry.Update(&did.Doc{ID: "1:id:123"}, vdrapi.WithOption("k1", "v1"))
 		require.NoError(t, err)
 	})
 
 	t.Run("test opts passed to accept", func(t *testing.T) {
 		registry := New(WithVDR(&mockvdr.VDR{
-			AcceptFunc: func(method string, opts ...vdrspi.DIDMethodOption) bool {
-				acceptOpts := &vdrspi.DIDMethodOpts{Values: make(map[string]interface{})}
+			AcceptFunc: func(method string, opts ...vdrapi.DIDMethodOption) bool {
+				acceptOpts := &vdrapi.DIDMethodOpts{Values: make(map[string]interface{})}
 				// Apply options
 				for _, opt := range opts {
 					opt(acceptOpts)
@@ -189,7 +187,7 @@ func TestRegistry_Update(t *testing.T) {
 			},
 		}))
 
-		err := registry.Update(&did.Doc{ID: "1:id:123"}, vdrspi.WithOption("k1", "v1"))
+		err := registry.Update(&did.Doc{ID: "1:id:123"}, vdrapi.WithOption("k1", "v1"))
 		require.NoError(t, err)
 	})
 
@@ -217,7 +215,7 @@ func TestRegistry_Deactivate(t *testing.T) {
 
 	t.Run("test error from deactivate did", func(t *testing.T) {
 		registry := New(WithVDR(&mockvdr.VDR{
-			AcceptValue: true, DeactivateFunc: func(didID string, opts ...vdrspi.DIDMethodOption) error {
+			AcceptValue: true, DeactivateFunc: func(didID string, opts ...vdrapi.DIDMethodOption) error {
 				return fmt.Errorf("deactivate error")
 			},
 		}))
@@ -228,8 +226,8 @@ func TestRegistry_Deactivate(t *testing.T) {
 
 	t.Run("test opts passed", func(t *testing.T) {
 		registry := New(WithVDR(&mockvdr.VDR{
-			AcceptValue: true, DeactivateFunc: func(didID string, opts ...vdrspi.DIDMethodOption) error {
-				didOpts := &vdrspi.DIDMethodOpts{Values: make(map[string]interface{})}
+			AcceptValue: true, DeactivateFunc: func(didID string, opts ...vdrapi.DIDMethodOption) error {
+				didOpts := &vdrapi.DIDMethodOpts{Values: make(map[string]interface{})}
 				// Apply options
 				for _, opt := range opts {
 					opt(didOpts)
@@ -240,14 +238,14 @@ func TestRegistry_Deactivate(t *testing.T) {
 			},
 		}))
 
-		err := registry.Deactivate("1:id:123", vdrspi.WithOption("k1", "v1"))
+		err := registry.Deactivate("1:id:123", vdrapi.WithOption("k1", "v1"))
 		require.NoError(t, err)
 	})
 
 	t.Run("test opts passed to accept", func(t *testing.T) {
 		registry := New(WithVDR(&mockvdr.VDR{
-			AcceptFunc: func(method string, opts ...vdrspi.DIDMethodOption) bool {
-				acceptOpts := &vdrspi.DIDMethodOpts{Values: make(map[string]interface{})}
+			AcceptFunc: func(method string, opts ...vdrapi.DIDMethodOption) bool {
+				acceptOpts := &vdrapi.DIDMethodOpts{Values: make(map[string]interface{})}
 				// Apply options
 				for _, opt := range opts {
 					opt(acceptOpts)
@@ -259,7 +257,7 @@ func TestRegistry_Deactivate(t *testing.T) {
 			},
 		}))
 
-		err := registry.Deactivate("1:id:123", vdrspi.WithOption("k1", "v1"))
+		err := registry.Deactivate("1:id:123", vdrapi.WithOption("k1", "v1"))
 		require.NoError(t, err)
 	})
 
@@ -282,7 +280,7 @@ func TestRegistry_Create(t *testing.T) {
 		registry := New(WithVDR(&mockvdr.VDR{
 			AcceptValue: true,
 			CreateFunc: func(didDoc *did.Doc,
-				opts ...vdrspi.DIDMethodOption) (doc *did.DocResolution, e error) {
+				opts ...vdrapi.DIDMethodOption) (doc *did.DocResolution, e error) {
 				require.Equal(t, "key1", didDoc.VerificationMethod[0].ID)
 				return &did.DocResolution{DIDDocument: &did.Doc{ID: "1:id:123"}}, nil
 			},
@@ -293,8 +291,8 @@ func TestRegistry_Create(t *testing.T) {
 
 	t.Run("test opts passed to accept", func(t *testing.T) {
 		registry := New(WithVDR(&mockvdr.VDR{
-			AcceptFunc: func(method string, opts ...vdrspi.DIDMethodOption) bool {
-				acceptOpts := &vdrspi.DIDMethodOpts{Values: make(map[string]interface{})}
+			AcceptFunc: func(method string, opts ...vdrapi.DIDMethodOption) bool {
+				acceptOpts := &vdrapi.DIDMethodOpts{Values: make(map[string]interface{})}
 				// Apply options
 				for _, opt := range opts {
 					opt(acceptOpts)
@@ -307,7 +305,7 @@ func TestRegistry_Create(t *testing.T) {
 
 		_, err := registry.Create("id",
 			&did.Doc{VerificationMethod: []did.VerificationMethod{{ID: "key1"}}},
-			vdrspi.WithOption("k1", "v1"))
+			vdrapi.WithOption("k1", "v1"))
 		require.NoError(t, err)
 	})
 
@@ -315,7 +313,7 @@ func TestRegistry_Create(t *testing.T) {
 		registry := New(WithVDR(&mockvdr.VDR{
 			AcceptValue: true,
 			CreateFunc: func(didDoc *did.Doc,
-				opts ...vdrspi.DIDMethodOption) (doc *did.DocResolution, e error) {
+				opts ...vdrapi.DIDMethodOption) (doc *did.DocResolution, e error) {
 				require.Equal(t, "key1", didDoc.VerificationMethod[0].ID)
 				return &did.DocResolution{DIDDocument: &did.Doc{ID: "1:id:123"}}, nil
 			},
@@ -327,7 +325,7 @@ func TestRegistry_Create(t *testing.T) {
 		registry := New(WithVDR(&mockvdr.VDR{
 			AcceptValue: true,
 			CreateFunc: func(didDoc *did.Doc,
-				opts ...vdrspi.DIDMethodOption) (doc *did.DocResolution, e error) {
+				opts ...vdrapi.DIDMethodOption) (doc *did.DocResolution, e error) {
 				return nil, fmt.Errorf("build did error")
 			},
 		}))
@@ -340,7 +338,7 @@ func TestRegistry_Create(t *testing.T) {
 		registry := New(WithVDR(&mockvdr.VDR{
 			AcceptValue: true,
 			CreateFunc: func(didDoc *did.Doc,
-				opts ...vdrspi.DIDMethodOption) (doc *did.DocResolution, e error) {
+				opts ...vdrapi.DIDMethodOption) (doc *did.DocResolution, e error) {
 				return &did.DocResolution{DIDDocument: &did.Doc{ID: "1:id:123"}}, nil
 			},
 		}))
