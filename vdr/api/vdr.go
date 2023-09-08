@@ -10,8 +10,7 @@ package api
 import (
 	"errors"
 
-	"github.com/trustbloc/vc-go/did"
-	spivdr "github.com/trustbloc/vc-go/spi/vdr"
+	"github.com/trustbloc/did-go/doc/did"
 )
 
 // ErrNotFound is returned when a DID resolver does not find the DID.
@@ -30,31 +29,20 @@ const (
 
 // Registry vdr registry.
 type Registry interface {
-	Resolve(did string, opts ...spivdr.DIDMethodOption) (*did.DocResolution, error)
-	Create(method string, did *did.Doc, opts ...spivdr.DIDMethodOption) (*did.DocResolution, error)
-	Update(did *did.Doc, opts ...spivdr.DIDMethodOption) error
-	Deactivate(did string, opts ...spivdr.DIDMethodOption) error
+	Resolve(did string, opts ...DIDMethodOption) (*did.DocResolution, error)
+	Create(method string, did *did.Doc, opts ...DIDMethodOption) (*did.DocResolution, error)
+	Update(did *did.Doc, opts ...DIDMethodOption) error
+	Deactivate(did string, opts ...DIDMethodOption) error
 	Close() error
 }
 
 // VDR verifiable data registry interface.
 // TODO https://github.com/hyperledger/aries-framework-go/issues/2475
 type VDR interface {
-	Read(did string, opts ...spivdr.DIDMethodOption) (*did.DocResolution, error)
-	Create(did *did.Doc, opts ...spivdr.DIDMethodOption) (*did.DocResolution, error)
-	Accept(method string, opts ...spivdr.DIDMethodOption) bool
-	Update(did *did.Doc, opts ...spivdr.DIDMethodOption) error
-	Deactivate(did string, opts ...spivdr.DIDMethodOption) error
+	Read(did string, opts ...DIDMethodOption) (*did.DocResolution, error)
+	Create(did *did.Doc, opts ...DIDMethodOption) (*did.DocResolution, error)
+	Accept(method string, opts ...DIDMethodOption) bool
+	Update(did *did.Doc, opts ...DIDMethodOption) error
+	Deactivate(did string, opts ...DIDMethodOption) error
 	Close() error
-}
-
-// DIDMethodOpts did method opts.
-type DIDMethodOpts = spivdr.DIDMethodOpts
-
-// DIDMethodOption is a did method option.
-type DIDMethodOption = spivdr.DIDMethodOption
-
-// WithOption add option for did method.
-func WithOption(name string, value interface{}) DIDMethodOption {
-	return spivdr.WithOption(name, value)
 }

@@ -27,16 +27,15 @@ import (
 	"github.com/trustbloc/sidetree-core-go/pkg/util/edsigner"
 	"github.com/trustbloc/sidetree-core-go/pkg/util/pubkey"
 	"github.com/trustbloc/sidetree-core-go/pkg/versions/1_0/client"
-	"github.com/trustbloc/vc-go/did"
 
-	vdrapi "github.com/trustbloc/did-go/vdr/api"
-	mockvdr "github.com/trustbloc/did-go/vdr/mock"
-
+	"github.com/trustbloc/did-go/doc/did"
 	"github.com/trustbloc/did-go/method/sidetree/api"
 	"github.com/trustbloc/did-go/method/sidetree/option/create"
 	"github.com/trustbloc/did-go/method/sidetree/option/deactivate"
 	"github.com/trustbloc/did-go/method/sidetree/option/recovery"
 	"github.com/trustbloc/did-go/method/sidetree/option/update"
+	vdrapi "github.com/trustbloc/did-go/vdr/api"
+	mockvdr "github.com/trustbloc/did-go/vdr/mock"
 )
 
 const validDocResolution = `

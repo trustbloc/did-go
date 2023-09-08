@@ -12,7 +12,8 @@ import (
 	"fmt"
 
 	"github.com/trustbloc/kms-go/doc/jose/jwk"
-	docdid "github.com/trustbloc/vc-go/did"
+
+	docdid "github.com/trustbloc/did-go/doc/did"
 )
 
 const (

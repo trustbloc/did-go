@@ -10,8 +10,7 @@ package jwk
 import (
 	"fmt"
 
-	diddoc "github.com/trustbloc/vc-go/did"
-
+	diddoc "github.com/trustbloc/did-go/doc/did"
 	vdrapi "github.com/trustbloc/did-go/vdr/api"
 )
 

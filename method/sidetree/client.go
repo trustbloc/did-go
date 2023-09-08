@@ -23,8 +23,8 @@ import (
 	"github.com/trustbloc/sidetree-core-go/pkg/patch"
 	"github.com/trustbloc/sidetree-core-go/pkg/util/pubkey"
 	"github.com/trustbloc/sidetree-core-go/pkg/versions/1_0/client"
-	docdid "github.com/trustbloc/vc-go/did"
 
+	docdid "github.com/trustbloc/did-go/doc/did"
 	"github.com/trustbloc/did-go/method/sidetree/doc"
 	"github.com/trustbloc/did-go/method/sidetree/option/create"
 	"github.com/trustbloc/did-go/method/sidetree/option/deactivate"

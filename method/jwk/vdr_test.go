@@ -11,9 +11,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	vdrapi "github.com/trustbloc/did-go/vdr/api"
-
 	"github.com/trustbloc/did-go/method/jwk"
+	vdrapi "github.com/trustbloc/did-go/vdr/api"
 )
 
 var _ vdrapi.VDR = (*jwk.VDR)(nil) // verify interface compliance

@@ -11,11 +11,9 @@ import (
 	"fmt"
 	"strings"
 
-	diddoc "github.com/trustbloc/vc-go/did"
-	vdrspi "github.com/trustbloc/vc-go/spi/vdr"
-
+	diddoc "github.com/trustbloc/did-go/doc/did"
+	"github.com/trustbloc/did-go/method/peer"
 	vdrapi "github.com/trustbloc/did-go/vdr/api"
-	"github.com/trustbloc/did-go/vdr/peer"
 )
 
 const didAcceptOpt = "didAcceptOpt"
@@ -43,14 +41,14 @@ func New(opts ...Option) *Registry {
 }
 
 // Resolve did document.
-func (r *Registry) Resolve(did string, opts ...vdrspi.DIDMethodOption) (*diddoc.DocResolution, error) {
+func (r *Registry) Resolve(did string, opts ...vdrapi.DIDMethodOption) (*diddoc.DocResolution, error) {
 	didMethod, err := GetDidMethod(did)
 	if err != nil {
 		return nil, err
 	}
 
 	// create accept options with did and add existing options
-	acceptOpts := []vdrspi.DIDMethodOption{vdrspi.WithOption(didAcceptOpt, did)}
+	acceptOpts := []vdrapi.DIDMethodOption{vdrapi.WithOption(didAcceptOpt, did)}
 	acceptOpts = append(acceptOpts, opts...)
 
 	// resolve did method
@@ -73,14 +71,14 @@ func (r *Registry) Resolve(did string, opts ...vdrspi.DIDMethodOption) (*diddoc.
 }
 
 // Update did document.
-func (r *Registry) Update(didDoc *diddoc.Doc, opts ...vdrspi.DIDMethodOption) error {
+func (r *Registry) Update(didDoc *diddoc.Doc, opts ...vdrapi.DIDMethodOption) error {
 	didMethod, err := GetDidMethod(didDoc.ID)
 	if err != nil {
 		return err
 	}
 
 	// create accept options with did and add existing options
-	acceptOpts := []vdrspi.DIDMethodOption{vdrspi.WithOption(didAcceptOpt, didDoc.ID)}
+	acceptOpts := []vdrapi.DIDMethodOption{vdrapi.WithOption(didAcceptOpt, didDoc.ID)}
 	acceptOpts = append(acceptOpts, opts...)
 
 	// resolve did method
@@ -93,14 +91,14 @@ func (r *Registry) Update(didDoc *diddoc.Doc, opts ...vdrspi.DIDMethodOption) er
 }
 
 // Deactivate did document.
-func (r *Registry) Deactivate(did string, opts ...vdrspi.DIDMethodOption) error {
+func (r *Registry) Deactivate(did string, opts ...vdrapi.DIDMethodOption) error {
 	didMethod, err := GetDidMethod(did)
 	if err != nil {
 		return err
 	}
 
 	// create accept options with did and add existing options
-	acceptOpts := []vdrspi.DIDMethodOption{vdrspi.WithOption(didAcceptOpt, did)}
+	acceptOpts := []vdrapi.DIDMethodOption{vdrapi.WithOption(didAcceptOpt, did)}
 	acceptOpts = append(acceptOpts, opts...)
 
 	// resolve did method
@@ -114,8 +112,8 @@ func (r *Registry) Deactivate(did string, opts ...vdrspi.DIDMethodOption) error 
 
 // Create a new DID Document and store it in this registry.
 func (r *Registry) Create(didMethod string, did *diddoc.Doc,
-	opts ...vdrspi.DIDMethodOption) (*diddoc.DocResolution, error) {
-	docOpts := &vdrspi.DIDMethodOpts{Values: make(map[string]interface{})}
+	opts ...vdrapi.DIDMethodOption) (*diddoc.DocResolution, error) {
+	docOpts := &vdrapi.DIDMethodOpts{Values: make(map[string]interface{})}
 
 	for _, opt := range opts {
 		opt(docOpts)
@@ -135,14 +133,14 @@ func (r *Registry) Create(didMethod string, did *diddoc.Doc,
 }
 
 // applyDefaultDocOpts applies default creator options to doc options.
-func (r *Registry) applyDefaultDocOpts(docOpts *vdrspi.DIDMethodOpts,
-	opts ...vdrspi.DIDMethodOption) []vdrspi.DIDMethodOption {
+func (r *Registry) applyDefaultDocOpts(docOpts *vdrapi.DIDMethodOpts,
+	opts ...vdrapi.DIDMethodOption) []vdrapi.DIDMethodOption {
 	if docOpts.Values[peer.DefaultServiceType] == nil {
-		opts = append(opts, vdrspi.WithOption(peer.DefaultServiceType, r.defServiceType))
+		opts = append(opts, vdrapi.WithOption(peer.DefaultServiceType, r.defServiceType))
 	}
 
 	if docOpts.Values[peer.DefaultServiceEndpoint] == nil {
-		opts = append(opts, vdrspi.WithOption(peer.DefaultServiceEndpoint, r.defServiceEndpoint))
+		opts = append(opts, vdrapi.WithOption(peer.DefaultServiceEndpoint, r.defServiceEndpoint))
 	}
 
 	return opts
@@ -159,7 +157,7 @@ func (r *Registry) Close() error {
 	return nil
 }
 
-func (r *Registry) resolveVDR(method string, opts ...vdrspi.DIDMethodOption) (vdrapi.VDR, error) {
+func (r *Registry) resolveVDR(method string, opts ...vdrapi.DIDMethodOption) (vdrapi.VDR, error) {
 	for _, v := range r.vdr {
 		if v.Accept(method, opts...) {
 			return v, nil

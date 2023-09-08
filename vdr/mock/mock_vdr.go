@@ -7,8 +7,8 @@ SPDX-License-Identifier: Apache-2.0
 package mock
 
 import (
-	"github.com/trustbloc/vc-go/did"
-	vdrapi "github.com/trustbloc/vc-go/spi/vdr"
+	"github.com/trustbloc/did-go/doc/did"
+	vdrapi "github.com/trustbloc/did-go/vdr/api"
 )
 
 // VDR mock implementation of vdr

@@ -23,6 +23,10 @@ import (
 
 	"github.com/btcsuite/btcutil/base58"
 	jsonld "github.com/piprate/json-gold/ld"
+	ld "github.com/trustbloc/did-go/doc/ld/documentloader"
+	ldprocessor "github.com/trustbloc/did-go/doc/ld/processor"
+	ldstore "github.com/trustbloc/did-go/doc/ld/store"
+	httpbinding2 "github.com/trustbloc/did-go/method/httpbinding"
 	"github.com/trustbloc/orb/pkg/discovery/endpoint/client"
 	"github.com/trustbloc/orb/pkg/discovery/endpoint/client/models"
 	"github.com/trustbloc/orb/pkg/hashlink"
@@ -30,16 +34,10 @@ import (
 	"github.com/trustbloc/sidetree-core-go/pkg/commitment"
 	"github.com/trustbloc/sidetree-core-go/pkg/document"
 	"github.com/trustbloc/sidetree-core-go/pkg/util/pubkey"
-	docdid "github.com/trustbloc/vc-go/did"
-	ld "github.com/trustbloc/vc-go/ld/documentloader"
-	ldprocessor "github.com/trustbloc/vc-go/ld/processor"
-	ldstore "github.com/trustbloc/vc-go/ld/store"
 	"golang.org/x/net/http2"
 
+	docdid "github.com/trustbloc/did-go/doc/did"
 	"github.com/trustbloc/did-go/legacy/mem"
-	vdrapi "github.com/trustbloc/did-go/vdr/api"
-	"github.com/trustbloc/did-go/vdr/httpbinding"
-
 	"github.com/trustbloc/did-go/method/orb/internal/ldcontext"
 	"github.com/trustbloc/did-go/method/orb/lb"
 	"github.com/trustbloc/did-go/method/orb/tracing"
@@ -50,6 +48,7 @@ import (
 	"github.com/trustbloc/did-go/method/sidetree/option/deactivate"
 	"github.com/trustbloc/did-go/method/sidetree/option/recovery"
 	"github.com/trustbloc/did-go/method/sidetree/option/update"
+	vdrapi "github.com/trustbloc/did-go/vdr/api"
 )
 
 const (
@@ -76,9 +75,9 @@ const (
 	// RetryOptions sets retry options.
 	RetryOptions = "retryOptions"
 	// VersionIDOpt version id opt this option is not mandatory.
-	VersionIDOpt = httpbinding.VersionIDOpt
+	VersionIDOpt = httpbinding2.VersionIDOpt
 	// VersionTimeOpt version time opt this option is not mandatory.
-	VersionTimeOpt = httpbinding.VersionTimeOpt
+	VersionTimeOpt = httpbinding2.VersionTimeOpt
 	httpTimeOut    = 20 * time.Second
 	sha2_256       = 18 // multihash
 	ipfsGlobal     = "https://ipfs.io"
@@ -231,9 +230,9 @@ func New(keyRetriever KeyRetriever, opts ...Option) (*VDR, error) {
 		sidetree.WithAuthTokenProvider(v.authTokenProvider))
 
 	v.getHTTPVDR = func(url string) (vdr, error) {
-		return httpbinding.New(url,
-			httpbinding.WithHTTPClient(v.httpClient), httpbinding.WithResolveAuthToken(v.authToken),
-			httpbinding.WithTimeout(httpTimeOut), httpbinding.WithResolveAuthTokenProvider(v.authTokenProvider))
+		return httpbinding2.New(url,
+			httpbinding2.WithHTTPClient(v.httpClient), httpbinding2.WithResolveAuthToken(v.authToken),
+			httpbinding2.WithTimeout(httpTimeOut), httpbinding2.WithResolveAuthTokenProvider(v.authTokenProvider))
 	}
 
 	v.discoveryService, err = client.New(v.documentLoader, &casReader{
