@@ -134,13 +134,15 @@ func (v *VDR) Read(didID string, opts ...vdrspi.DIDMethodOption) (*did.DocResolu
 		return nil, vdrapi.ErrNotFound
 	}
 
+	// TODO: this code is looking strange, ParseDocumentResolution can return ErrDIDDocumentNotExist
+	// Is it possible that we find did, but it not contains did document?
 	documentResolution, err := did.ParseDocumentResolution(data)
 	if err != nil {
 		if !errors.Is(err, did.ErrDIDDocumentNotExist) {
 			return nil, err
 		}
 
-		logger.Warnf("parse document resolution failed %w", err)
+		errLogger.Printf("parse document resolution failed %v", err)
 	} else {
 		return documentResolution, nil
 	}

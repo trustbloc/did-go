@@ -8,13 +8,18 @@ package rollingcounter
 
 import (
 	"crypto/rand"
+	"io"
+	"log"
 	"math/big"
 	"sync/atomic"
-
-	"github.com/hyperledger/aries-framework-go/component/log"
 )
 
-var logger = log.New("aries-framework-ext/vdr/orb") //nolint: gochecknoglobals
+var debugLogger = log.New(io.Discard, " [did-go/method/orb] ", log.Ldate|log.Ltime|log.LUTC)
+
+// SetDebugOutput is used to set output of debug logs.
+func SetDebugOutput(out io.Writer) {
+	debugLogger.SetOutput(out)
+}
 
 // Counter is a rolling counter that increments an index up to a maximum value. If the counter reaches
 // the maximum then the counter resets to 0. A single counter instance may be used by multiple Go routines.
@@ -37,7 +42,7 @@ func (c *Counter) Next(n int) int {
 
 	for {
 		current := atomic.LoadInt32(&c.index)
-		logger.Debugf("Current index: %d", current)
+		debugLogger.Printf("Current index: %d", current)
 
 		i := int(current)
 		if i == -1 {
@@ -56,11 +61,11 @@ func (c *Counter) Next(n int) int {
 		}
 
 		if atomic.CompareAndSwapInt32(&c.index, current, int32(i)) {
-			logger.Debugf("Set the counter to %d", i)
+			debugLogger.Printf("Set the counter to %d", i)
 
 			return i
 		}
 
-		logger.Debugf("Another thread has already incremented the counter. Trying again...")
+		debugLogger.Printf("Another thread has already incremented the counter. Trying again...")
 	}
 }

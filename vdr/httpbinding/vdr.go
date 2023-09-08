@@ -9,16 +9,17 @@ package httpbinding
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"time"
 
-	"github.com/hyperledger/aries-framework-go/component/log"
 	"github.com/trustbloc/vc-go/did"
 	vdrapi "github.com/trustbloc/vc-go/spi/vdr"
 )
 
-var logger = log.New("aries-framework/vdr/httpbinding")
+var errLogger = log.New(os.Stderr, " [did-go/vdr/httpbinding] ", log.Ldate|log.Ltime|log.LUTC)
 
 type authTokenProvider interface {
 	AuthToken() (string, error)
@@ -121,6 +122,6 @@ func WithResolveAuthTokenProvider(p authTokenProvider) Option {
 func closeResponseBody(respBody io.Closer) {
 	e := respBody.Close()
 	if e != nil {
-		logger.Errorf("Failed to close response body: %v", e)
+		errLogger.Printf("Failed to close response body: %v", e)
 	}
 }

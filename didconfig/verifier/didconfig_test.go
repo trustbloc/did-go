@@ -10,6 +10,7 @@ import (
 	"crypto/ed25519"
 	"crypto/rand"
 	"encoding/json"
+	"strings"
 	"testing"
 	"time"
 
@@ -652,6 +653,15 @@ func TestIsValidDomainLinkageCredential(t *testing.T) {
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "credentialSubject.id MUST be a DID")
 	})
+}
+
+func TestSetDebugOutput(t *testing.T) {
+	output := &strings.Builder{}
+	SetDebugOutput(output)
+
+	debugLogger.Print("Test")
+
+	require.Contains(t, output.String(), "Test")
 }
 
 func createEdDSAJWS(t *testing.T, cred *verifiable.Credential, signer verifiable.Signer,

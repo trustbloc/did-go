@@ -14,12 +14,11 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
-	vdrapi "github.com/trustbloc/did-go/vdr/api"
-	mockvdr "github.com/trustbloc/did-go/vdr/mock"
 	"github.com/trustbloc/kms-go/doc/jose/jwk/jwksupport"
 	"github.com/trustbloc/orb/pkg/discovery/endpoint/client/models"
 	"github.com/trustbloc/sidetree-core-go/pkg/document"
@@ -29,6 +28,9 @@ import (
 	"github.com/trustbloc/sidetree-core-go/pkg/util/pubkey"
 	"github.com/trustbloc/sidetree-core-go/pkg/versions/1_0/client"
 	"github.com/trustbloc/vc-go/did"
+
+	vdrapi "github.com/trustbloc/did-go/vdr/api"
+	mockvdr "github.com/trustbloc/did-go/vdr/mock"
 
 	"github.com/trustbloc/did-go/method/sidetree/api"
 	"github.com/trustbloc/did-go/method/sidetree/option/create"
@@ -1430,6 +1432,15 @@ func TestVDRI_Read(t *testing.T) {
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "resolutionEndpointsOpt not array of string")
 	})
+}
+
+func TestSetDebugOutput(t *testing.T) {
+	output := &strings.Builder{}
+	SetDebugOutput(output)
+
+	debugLogger.Print("Test")
+
+	require.Contains(t, output.String(), "Test")
 }
 
 type mockSidetreeClient struct {

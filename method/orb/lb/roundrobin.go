@@ -7,12 +7,17 @@ SPDX-License-Identifier: Apache-2.0
 package lb
 
 import (
-	"github.com/hyperledger/aries-framework-go/component/log"
+	"log"
+	"os"
 
 	"github.com/trustbloc/did-go/method/orb/util/concurrent/rollingcounter"
 )
 
-var logger = log.New("aries-framework-ext/vdr/orb") //nolint: gochecknoglobals
+const (
+	logPrefix = " [did-go/method/orb] "
+)
+
+var errorLogger = log.New(os.Stderr, logPrefix, log.Ldate|log.Ltime|log.LUTC)
 
 // RoundRobin implements a round-robin load-balance policy.
 type RoundRobin struct {
@@ -29,7 +34,7 @@ func NewRoundRobin() *RoundRobin {
 // Choose chooses from the list of domains in round-robin fashion.
 func (rb *RoundRobin) Choose(domains []string) (string, error) {
 	if len(domains) == 0 {
-		logger.Warnf("No domains to choose from!")
+		errorLogger.Printf("No domains to choose from!")
 
 		return "", nil
 	}

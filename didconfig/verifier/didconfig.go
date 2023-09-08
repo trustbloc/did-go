@@ -9,15 +9,17 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"log"
 	"net/http"
 	"net/url"
+	"os"
 
 	jsonld "github.com/piprate/json-gold/ld"
 	"github.com/trustbloc/kms-go/doc/jose"
 	"github.com/trustbloc/vc-go/jwt"
 	"github.com/trustbloc/vc-go/verifiable"
 
-	"github.com/hyperledger/aries-framework-go/component/log"
 	diddoc "github.com/trustbloc/vc-go/did"
 
 	vdrapi "github.com/trustbloc/vc-go/spi/vdr"
@@ -26,7 +28,17 @@ import (
 	"github.com/trustbloc/did-go/vdr/key"
 )
 
-var logger = log.New("aries-framework/doc/didconfig")
+const (
+	logPrefix = " [did-go/didconfig/verifier] "
+)
+
+var errorLogger = log.New(os.Stderr, logPrefix, log.Ldate|log.Ltime|log.LUTC)
+var debugLogger = log.New(io.Discard, logPrefix, log.Ldate|log.Ltime|log.LUTC)
+
+// SetDebugOutput is used to set output of debug logs.
+func SetDebugOutput(out io.Writer) {
+	debugLogger.SetOutput(out)
+}
 
 const (
 	// ContextV0 is did configuration context version 0.
@@ -99,7 +111,7 @@ func VerifyDIDAndDomain(didConfig []byte, did, domain string, opts ...DIDConfigu
 		return err
 	}
 
-	logger.Debugf("found %d domain linkage credential(s) for DID[%s] and domain[%s]", len(credentials), did, domain)
+	debugLogger.Printf("found %d domain linkage credential(s) for DID[%s] and domain[%s]", len(credentials), did, domain)
 
 	for _, credBytes := range credentials {
 		credOpts := getParseCredentialOptions(false, didCfgOpts)
@@ -113,7 +125,7 @@ func VerifyDIDAndDomain(didConfig []byte, did, domain string, opts ...DIDConfigu
 		}
 
 		// failed to verify credential proof - log info and continue to next one
-		logger.Warnf("skipping domain linkage credential for DID[%s] and domain[%s] due to error: %s",
+		errorLogger.Printf("skipping domain linkage credential for DID[%s] and domain[%s] due to error: %s",
 			did, domain, err.Error())
 	}
 
@@ -394,20 +406,20 @@ func getCredentials(linkedDIDs []interface{}, did, domain string, opts ...verifi
 		vc, err := verifiable.ParseCredential(rawBytes, opts...)
 		if err != nil {
 			// failed to parse credential - continue to next one
-			logger.Infof("skipping credential due to error: %s", string(rawBytes), err.Error())
+			debugLogger.Printf("skipping credential [%s] due to error: %v", string(rawBytes), err.Error())
 
 			continue
 		}
 
 		if vc.Issuer.ID != did {
-			logger.Infof("skipping credential since issuer[%s] is different from DID[%s]", vc.Issuer.ID, did)
+			debugLogger.Printf("skipping credential since issuer[%s] is different from DID[%s]", vc.Issuer.ID, did)
 
 			continue
 		}
 
 		err = isValidDomainLinkageCredential(vc, did, domain)
 		if err != nil {
-			logger.Warnf("credential is not a valid domain linkage credential for DID[%s] and domain[%s]: %s",
+			errorLogger.Printf("credential is not a valid domain linkage credential for DID[%s] and domain[%s]: %s",
 				did, domain, err.Error())
 
 			continue

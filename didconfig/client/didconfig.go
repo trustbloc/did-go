@@ -11,20 +11,20 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
 	"time"
 
 	jsonld "github.com/piprate/json-gold/ld"
 	"github.com/trustbloc/vc-go/did"
-
-	"github.com/hyperledger/aries-framework-go/component/log"
 
 	vdrspi "github.com/trustbloc/vc-go/spi/vdr"
 
 	"github.com/trustbloc/did-go/didconfig/verifier"
 )
 
-var logger = log.New("aries-framework/client/did-config")
+var errLogger = log.New(os.Stderr, " [did-go/did-config/client] ", log.Ldate|log.Ltime|log.LUTC)
 
 const defaultTimeout = time.Minute
 
@@ -113,6 +113,6 @@ func (c *Client) VerifyDIDAndDomain(did, domain string) error {
 func closeResponseBody(respBody io.Closer) {
 	e := respBody.Close()
 	if e != nil {
-		logger.Warnf("failed to close response body: %v", e)
+		errLogger.Printf("failed to close response body: %v", e)
 	}
 }
