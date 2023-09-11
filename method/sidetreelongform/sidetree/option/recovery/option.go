@@ -10,8 +10,8 @@ import (
 	"crypto"
 
 	docdid "github.com/trustbloc/did-go/doc/did"
-	"github.com/trustbloc/did-go/method/sidetree/api"
-	"github.com/trustbloc/did-go/method/sidetree/doc"
+	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree/api"
+	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree/doc"
 )
 
 // Opts recover did opts.

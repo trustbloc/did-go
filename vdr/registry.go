@@ -12,7 +12,6 @@ import (
 	"strings"
 
 	diddoc "github.com/trustbloc/did-go/doc/did"
-	"github.com/trustbloc/did-go/method/peer"
 	vdrapi "github.com/trustbloc/did-go/vdr/api"
 )
 
@@ -124,26 +123,12 @@ func (r *Registry) Create(didMethod string, did *diddoc.Doc,
 		return nil, err
 	}
 
-	didDocResolution, err := method.Create(did, r.applyDefaultDocOpts(docOpts, opts...)...)
+	didDocResolution, err := method.Create(did, opts...)
 	if err != nil {
 		return nil, err
 	}
 
 	return didDocResolution, nil
-}
-
-// applyDefaultDocOpts applies default creator options to doc options.
-func (r *Registry) applyDefaultDocOpts(docOpts *vdrapi.DIDMethodOpts,
-	opts ...vdrapi.DIDMethodOption) []vdrapi.DIDMethodOption {
-	if docOpts.Values[peer.DefaultServiceType] == nil {
-		opts = append(opts, vdrapi.WithOption(peer.DefaultServiceType, r.defServiceType))
-	}
-
-	if docOpts.Values[peer.DefaultServiceEndpoint] == nil {
-		opts = append(opts, vdrapi.WithOption(peer.DefaultServiceEndpoint, r.defServiceEndpoint))
-	}
-
-	return opts
 }
 
 // Close frees resources being maintained by vdr.
