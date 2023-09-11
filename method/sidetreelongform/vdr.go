@@ -20,10 +20,10 @@ import (
 
 	docdid "github.com/trustbloc/did-go/doc/did"
 	"github.com/trustbloc/did-go/legacy/mem"
-	"github.com/trustbloc/did-go/method/sidetree"
-	"github.com/trustbloc/did-go/method/sidetree/doc"
-	"github.com/trustbloc/did-go/method/sidetree/option/create"
 	"github.com/trustbloc/did-go/method/sidetreelongform/dochandler"
+	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree"
+	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree/doc"
+	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree/option/create"
 	vdrapi "github.com/trustbloc/did-go/vdr/api"
 )
 

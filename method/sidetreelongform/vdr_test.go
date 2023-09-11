@@ -18,6 +18,7 @@ import (
 	ld "github.com/trustbloc/did-go/doc/ld/documentloader"
 	mockldstore "github.com/trustbloc/did-go/doc/ld/mock"
 	ldstore "github.com/trustbloc/did-go/doc/ld/store"
+	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree/option/create"
 	"github.com/trustbloc/kms-go/crypto/primitive/bbs12381g2pub"
 	"github.com/trustbloc/kms-go/doc/jose/jwk"
 	"github.com/trustbloc/kms-go/doc/jose/jwk/jwksupport"
@@ -25,7 +26,6 @@ import (
 
 	ariesdid "github.com/trustbloc/did-go/doc/did"
 	model "github.com/trustbloc/did-go/doc/did/endpoint"
-	"github.com/trustbloc/did-go/method/sidetree/option/create"
 	vdrapi "github.com/trustbloc/did-go/vdr/api"
 )
 
