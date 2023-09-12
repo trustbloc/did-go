@@ -7,12 +7,12 @@ SPDX-License-Identifier: Apache-2.0
 package client
 
 import (
-	"github.com/trustbloc/sidetree-core-go/pkg/api/protocol"
-	"github.com/trustbloc/sidetree-core-go/pkg/versions/1_0/doccomposer"
-	"github.com/trustbloc/sidetree-core-go/pkg/versions/1_0/doctransformer/didtransformer"
-	"github.com/trustbloc/sidetree-core-go/pkg/versions/1_0/docvalidator/didvalidator"
-	"github.com/trustbloc/sidetree-core-go/pkg/versions/1_0/operationapplier"
-	"github.com/trustbloc/sidetree-core-go/pkg/versions/1_0/operationparser"
+	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree-core/api/protocol"
+	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree-core/versions/1_0/doccomposer"
+	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree-core/versions/1_0/doctransformer/didtransformer"
+	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree-core/versions/1_0/docvalidator/didvalidator"
+	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree-core/versions/1_0/operationapplier"
+	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree-core/versions/1_0/operationparser"
 
 	vcommon "github.com/trustbloc/did-go/method/sidetreelongform/dochandler/protocolversion/versions/common"
 	protocolcfg "github.com/trustbloc/did-go/method/sidetreelongform/dochandler/protocolversion/versions/v1_0/config"

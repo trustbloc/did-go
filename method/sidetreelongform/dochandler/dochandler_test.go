@@ -11,10 +11,11 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/trustbloc/sidetree-core-go/pkg/document"
-	"github.com/trustbloc/sidetree-core-go/pkg/encoder"
-	"github.com/trustbloc/sidetree-core-go/pkg/mocks"
-	"github.com/trustbloc/sidetree-core-go/pkg/versions/1_0/model"
+
+	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree-core/document"
+	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree-core/encoder"
+	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree-core/mocks"
+	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree-core/versions/1_0/model"
 )
 
 const (

@@ -7,7 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 package common
 
 import (
-	"github.com/trustbloc/sidetree-core-go/pkg/api/protocol"
+	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree-core/api/protocol"
 )
 
 // ProtocolVersion implements the protocol.Version interface.

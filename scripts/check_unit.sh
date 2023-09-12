@@ -21,7 +21,7 @@ fi
 # Running wallet-sdk unit tests
 PKGS=`go list github.com/trustbloc/did-go/... 2> /dev/null | \
                                                   grep -v /mocks`
-go test $PKGS -count=1 -race -coverprofile=profile.out -covermode=atomic -timeout=10m
+go test $PKGS -count=1 -race -coverprofile=profile.out -covermode=atomic -timeout=10m -tags testing
 amend_coverage_file
 
 
