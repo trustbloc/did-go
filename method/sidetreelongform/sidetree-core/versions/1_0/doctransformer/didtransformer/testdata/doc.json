@@ -1,0 +1,100 @@
+{
+  "alsoKnownAs": ["https:\\somebody.com"],
+  "publicKey": [
+    {
+      "id": "master",
+      "type": "EcdsaSecp256k1VerificationKey2019",
+      "purposes": ["authentication", "assertionMethod", "keyAgreement", "capabilityDelegation", "capabilityInvocation"],
+      "publicKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256K",
+        "x": "PUymIqdtF_qxaAqPABSw-C-owT1KYYQbsMKFM-L9fJA",
+        "y": "nM84jDHCMOTGTh_ZdHq4dBBdo4Z5PkEOW9jA8z8IsGc"
+      }
+    },
+    {
+      "id": "auth",
+      "type": "JsonWebKey2020",
+      "purposes": ["authentication"],
+      "publicKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256K",
+        "x": "PUymIqdtF_qxaAqPABSw-C-owT1KYYQbsMKFM-L9fJA",
+        "y": "nM84jDHCMOTGTh_ZdHq4dBBdo4Z5PkEOW9jA8z8IsGc"
+      }
+    },
+    {
+      "id": "assertion",
+      "type": "JsonWebKey2020",
+      "purposes": ["assertionMethod"],
+      "publicKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256K",
+        "x": "PUymIqdtF_qxaAqPABSw-C-owT1KYYQbsMKFM-L9fJA",
+        "y": "nM84jDHCMOTGTh_ZdHq4dBBdo4Z5PkEOW9jA8z8IsGc"
+      }
+    },
+    {
+      "id": "agreement",
+      "type": "JsonWebKey2020",
+      "purposes": ["keyAgreement"],
+      "publicKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256K",
+        "x": "PUymIqdtF_qxaAqPABSw-C-owT1KYYQbsMKFM-L9fJA",
+        "y": "nM84jDHCMOTGTh_ZdHq4dBBdo4Z5PkEOW9jA8z8IsGc"
+      }
+    },
+    {
+      "id": "invocation",
+      "type": "JsonWebKey2020",
+      "purposes": ["capabilityInvocation"],
+      "publicKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256K",
+        "x": "PUymIqdtF_qxaAqPABSw-C-owT1KYYQbsMKFM-L9fJA",
+        "y": "nM84jDHCMOTGTh_ZdHq4dBBdo4Z5PkEOW9jA8z8IsGc"
+      }
+    },
+    {
+      "id": "delegation",
+      "type": "JsonWebKey2020",
+      "purposes": ["capabilityDelegation"],
+      "publicKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256K",
+        "x": "PUymIqdtF_qxaAqPABSw-C-owT1KYYQbsMKFM-L9fJA",
+        "y": "nM84jDHCMOTGTh_ZdHq4dBBdo4Z5PkEOW9jA8z8IsGc"
+      }
+    },
+    {
+      "id": "general",
+      "type": "JsonWebKey2020",
+      "purposes": [],
+      "publicKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256K",
+        "x": "PUymIqdtF_qxaAqPABSw-C-owT1KYYQbsMKFM-L9fJA",
+        "y": "nM84jDHCMOTGTh_ZdHq4dBBdo4Z5PkEOW9jA8z8IsGc"
+      }
+    }
+  ],
+  "service": [
+    {
+      "id": "hub",
+      "type": "IdentityHub",
+      "routingKeys": "routingKeysValue",
+      "recipientKeys": "recipientKeysValue",
+      "serviceEndpoint": "https://example.com/hub/"
+    },
+    {
+      "id": "hub-object",
+      "type": "IdentityHub",
+      "serviceEndpoint": {
+        "@context": "https://schema.identity.foundation/hub",
+        "type": "UserHubEndpoint",
+        "instances": ["did:example:456", "did:example:789"]
+      }
+    }
+  ]
+}

@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/trustbloc/sidetree-core-go/pkg/api/protocol"
+	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree-core/api/protocol"
 )
 
 // New creates new client version provider per namespace.

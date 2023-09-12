@@ -1,0 +1,144 @@
+{
+  "publicKey": [
+    {
+      "id": "master",
+      "type": "EcdsaSecp256k1VerificationKey2019",
+      "purposes": ["authentication", "assertionMethod", "keyAgreement", "capabilityDelegation", "capabilityInvocation"],
+      "publicKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256K",
+        "x": "PUymIqdtF_qxaAqPABSw-C-owT1KYYQbsMKFM-L9fJA",
+        "y": "nM84jDHCMOTGTh_ZdHq4dBBdo4Z5PkEOW9jA8z8IsGc"
+      }
+    },
+    {
+      "id": "dual-auth-gen",
+      "type": "JsonWebKey2020",
+      "purposes": ["authentication"],
+      "publicKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256K",
+        "x": "PUymIqdtF_qxaAqPABSw-C-owT1KYYQbsMKFM-L9fJA",
+        "y": "nM84jDHCMOTGTh_ZdHq4dBBdo4Z5PkEOW9jA8z8IsGc"
+      }
+    },
+    {
+      "id": "auth-only",
+      "type": "JsonWebKey2020",
+      "purposes": ["authentication"],
+      "publicKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256K",
+        "x": "PUymIqdtF_qxaAqPABSw-C-owT1KYYQbsMKFM-L9fJA",
+        "y": "nM84jDHCMOTGTh_ZdHq4dBBdo4Z5PkEOW9jA8z8IsGc"
+      }
+    },
+    {
+      "id": "dual-assertion-gen",
+      "type": "JsonWebKey2020",
+      "purposes": ["assertionMethod"],
+      "publicKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256K",
+        "x": "PUymIqdtF_qxaAqPABSw-C-owT1KYYQbsMKFM-L9fJA",
+        "y": "nM84jDHCMOTGTh_ZdHq4dBBdo4Z5PkEOW9jA8z8IsGc"
+      }
+    },
+    {
+      "id": "assertion-only",
+      "type": "JsonWebKey2020",
+      "purposes": ["assertionMethod"],
+      "publicKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256K",
+        "x": "PUymIqdtF_qxaAqPABSw-C-owT1KYYQbsMKFM-L9fJA",
+        "y": "nM84jDHCMOTGTh_ZdHq4dBBdo4Z5PkEOW9jA8z8IsGc"
+      }
+    },
+    {
+      "id": "dual-agreement-gen",
+      "type": "JsonWebKey2020",
+      "purposes": ["keyAgreement"],
+      "publicKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256K",
+        "x": "PUymIqdtF_qxaAqPABSw-C-owT1KYYQbsMKFM-L9fJA",
+        "y": "nM84jDHCMOTGTh_ZdHq4dBBdo4Z5PkEOW9jA8z8IsGc"
+      }
+    },
+    {
+      "id": "agreement-only",
+      "type": "JsonWebKey2020",
+      "purposes": ["keyAgreement"],
+      "publicKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256K",
+        "x": "PUymIqdtF_qxaAqPABSw-C-owT1KYYQbsMKFM-L9fJA",
+        "y": "nM84jDHCMOTGTh_ZdHq4dBBdo4Z5PkEOW9jA8z8IsGc"
+      }
+    },
+    {
+      "id": "dual-invocation-gen",
+      "type": "JsonWebKey2020",
+      "purposes": ["capabilityInvocation"],
+      "publicKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256K",
+        "x": "PUymIqdtF_qxaAqPABSw-C-owT1KYYQbsMKFM-L9fJA",
+        "y": "nM84jDHCMOTGTh_ZdHq4dBBdo4Z5PkEOW9jA8z8IsGc"
+      }
+    },
+    {
+      "id": "invocation-only",
+      "type": "JsonWebKey2020",
+      "purposes": ["capabilityInvocation"],
+      "publicKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256K",
+        "x": "PUymIqdtF_qxaAqPABSw-C-owT1KYYQbsMKFM-L9fJA",
+        "y": "nM84jDHCMOTGTh_ZdHq4dBBdo4Z5PkEOW9jA8z8IsGc"
+      }
+    },
+    {
+      "id": "dual-delegation-gen",
+      "type": "JsonWebKey2020",
+      "purposes": ["capabilityDelegation"],
+      "publicKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256K",
+        "x": "PUymIqdtF_qxaAqPABSw-C-owT1KYYQbsMKFM-L9fJA",
+        "y": "nM84jDHCMOTGTh_ZdHq4dBBdo4Z5PkEOW9jA8z8IsGc"
+      }
+    },
+    {
+      "id": "delegation-only",
+      "type": "JsonWebKey2020",
+      "purposes": ["capabilityDelegation"],
+      "publicKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256K",
+        "x": "PUymIqdtF_qxaAqPABSw-C-owT1KYYQbsMKFM-L9fJA",
+        "y": "nM84jDHCMOTGTh_ZdHq4dBBdo4Z5PkEOW9jA8z8IsGc"
+      }
+    },
+    {
+      "id": "general-only",
+      "type": "JsonWebKey2020",
+      "publicKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256K",
+        "x": "PUymIqdtF_qxaAqPABSw-C-owT1KYYQbsMKFM-L9fJA",
+        "y": "nM84jDHCMOTGTh_ZdHq4dBBdo4Z5PkEOW9jA8z8IsGc"
+      }
+    }
+  ],
+  "service": [
+    {
+      "id": "hub",
+      "type": "IdentityHub",
+      "routingKeys": "routingKeysValue",
+      "recipientKeys": "recipientKeysValue",
+      "serviceEndpoint": "https://example.com/hub/"
+    }
+  ]
+}

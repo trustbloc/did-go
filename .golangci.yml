@@ -11,7 +11,7 @@ run:
   tests: true
   build-tags: [""]
   skip-dirs:
-    - pkg/crypto/primitive/bbs12381g2pub/internal/kilic/bls12-381
+    - method/sidetreelongform/sidetree-core/docutil
 
 output:
   format: colored-line-number

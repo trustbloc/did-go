@@ -4,7 +4,7 @@ package mocks
 import (
 	"sync"
 
-	"github.com/trustbloc/sidetree-core-go/pkg/api/protocol"
+	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree-core/api/protocol"
 
 	"github.com/trustbloc/did-go/method/sidetreelongform/dochandler/protocolversion/versions/common"
 )

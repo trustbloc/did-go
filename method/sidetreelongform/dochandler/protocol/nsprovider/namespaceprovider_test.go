@@ -10,8 +10,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/trustbloc/sidetree-core-go/pkg/api/protocol"
-	coremocks "github.com/trustbloc/sidetree-core-go/pkg/mocks"
+
+	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree-core/api/protocol"
+	coremocks "github.com/trustbloc/did-go/method/sidetreelongform/sidetree-core/mocks"
 
 	"github.com/trustbloc/did-go/method/sidetreelongform/dochandler/protocol/nsprovider"
 	"github.com/trustbloc/did-go/method/sidetreelongform/dochandler/protocol/verprovider"

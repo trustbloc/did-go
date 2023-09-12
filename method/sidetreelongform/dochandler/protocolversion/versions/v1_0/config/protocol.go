@@ -7,7 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 package config
 
 import (
-	"github.com/trustbloc/sidetree-core-go/pkg/api/protocol"
+	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree-core/api/protocol"
 )
 
 // GetProtocolConfig returns protocol config for this version.

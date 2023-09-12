@@ -14,9 +14,10 @@ import (
 
 	"github.com/btcsuite/btcutil/base58"
 	jsonld "github.com/piprate/json-gold/ld"
+
 	ld "github.com/trustbloc/did-go/doc/ld/documentloader"
 	ldstore "github.com/trustbloc/did-go/doc/ld/store"
-	"github.com/trustbloc/sidetree-core-go/pkg/document"
+	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree-core/document"
 
 	docdid "github.com/trustbloc/did-go/doc/did"
 	"github.com/trustbloc/did-go/legacy/mem"
