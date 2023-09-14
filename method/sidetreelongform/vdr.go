@@ -8,6 +8,8 @@ package sidetreelongform
 
 import (
 	"crypto"
+	"crypto/ed25519"
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -171,7 +173,7 @@ func (v *VDR) Close() error {
 
 // Create did doc.
 //
-//nolint:gocyclo
+//nolint:gocyclo,funlen
 func (v *VDR) Create(did *docdid.Doc,
 	opts ...vdrapi.DIDMethodOption) (*docdid.DocResolution, error) {
 	didMethodOpts := &vdrapi.DIDMethodOpts{Values: make(map[string]interface{})}
@@ -185,7 +187,12 @@ func (v *VDR) Create(did *docdid.Doc,
 
 	// get keys
 	if didMethodOpts.Values[UpdatePublicKeyOpt] == nil {
-		return nil, fmt.Errorf("updatePublicKey opt is empty")
+		updateKey, _, err := ed25519.GenerateKey(rand.Reader)
+		if err != nil {
+			return nil, fmt.Errorf("creating default update key: %w", err)
+		}
+
+		didMethodOpts.Values[UpdatePublicKeyOpt] = updateKey
 	}
 
 	updatePublicKey, ok := didMethodOpts.Values[UpdatePublicKeyOpt].(crypto.PublicKey)
@@ -194,7 +201,12 @@ func (v *VDR) Create(did *docdid.Doc,
 	}
 
 	if didMethodOpts.Values[RecoveryPublicKeyOpt] == nil {
-		return nil, fmt.Errorf("recoveryPublicKey opt is empty")
+		recoveryKey, _, err := ed25519.GenerateKey(rand.Reader)
+		if err != nil {
+			return nil, fmt.Errorf("creating default recovery key: %w", err)
+		}
+
+		didMethodOpts.Values[RecoveryPublicKeyOpt] = recoveryKey
 	}
 
 	recoveryPublicKey, ok := didMethodOpts.Values[RecoveryPublicKeyOpt].(crypto.PublicKey)

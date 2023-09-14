@@ -238,12 +238,6 @@ func TestVDRI_Create(t *testing.T) {
 		v, err := New()
 		require.NoError(t, err)
 
-		recoveryKey, _, err := ed25519.GenerateKey(rand.Reader)
-		require.NoError(t, err)
-
-		updateKey, _, err := ed25519.GenerateKey(rand.Reader)
-		require.NoError(t, err)
-
 		testVM, err := createVerificationMethod(ed25519KeyType, pubKey, "abc", "Ed25519VerificationKey2020")
 		require.NoError(t, err)
 
@@ -255,8 +249,7 @@ func TestVDRI_Create(t *testing.T) {
 		simpleDoc.AssertionMethod = append(simpleDoc.AssertionMethod,
 			*ariesdid.NewReferencedVerification(testVM, ariesdid.AssertionMethod))
 
-		docResolution, err := v.Create(simpleDoc, vdrapi.WithOption(UpdatePublicKeyOpt, updateKey),
-			vdrapi.WithOption(RecoveryPublicKeyOpt, recoveryKey))
+		docResolution, err := v.Create(simpleDoc)
 		require.NoError(t, err)
 		require.NotEmpty(t, docResolution.DIDDocument.ID)
 
@@ -368,26 +361,6 @@ func TestVDRI_Create(t *testing.T) {
 		require.Nil(t, docResolution)
 
 		require.Contains(t, err.Error(), "verificationMethod needs either JSONWebKey or Base58 key")
-	})
-
-	t.Run("test update public key opt is empty", func(t *testing.T) {
-		v, err := New()
-		require.NoError(t, err)
-
-		doc, err := v.Create(didDoc, vdrapi.WithOption(RecoveryPublicKeyOpt, []byte{}))
-		require.Error(t, err)
-		require.Nil(t, doc)
-		require.Contains(t, err.Error(), "updatePublicKey opt is empty")
-	})
-
-	t.Run("test recovery public key opt is empty", func(t *testing.T) {
-		v, err := New()
-		require.NoError(t, err)
-
-		doc, err := v.Create(didDoc, vdrapi.WithOption(UpdatePublicKeyOpt, []byte{}))
-		require.Error(t, err)
-		require.Nil(t, doc)
-		require.Contains(t, err.Error(), "recoveryPublicKey opt is empty")
 	})
 }
 
