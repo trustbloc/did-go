@@ -15,11 +15,11 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/trustbloc/bbs-signature-go/bbs12381g2pub"
 	ld "github.com/trustbloc/did-go/doc/ld/documentloader"
 	mockldstore "github.com/trustbloc/did-go/doc/ld/mock"
 	ldstore "github.com/trustbloc/did-go/doc/ld/store"
 	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree/option/create"
-	"github.com/trustbloc/kms-go/crypto/primitive/bbs12381g2pub"
 	"github.com/trustbloc/kms-go/doc/jose/jwk"
 	"github.com/trustbloc/kms-go/doc/jose/jwk/jwksupport"
 	"github.com/trustbloc/sidetree-core-go/pkg/document"
