@@ -107,8 +107,10 @@ github.com/stretchr/testify v1.8.2 h1:+h33VjcLVPDHtOdpUCuF+7gSuG3yGIftsP1YvFihtJ
 github.com/stretchr/testify v1.8.2/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o6fzry7u4=
 github.com/teserakt-io/golang-ed25519 v0.0.0-20210104091850-3888c087a4c8 h1:RBkacARv7qY5laaXGlF4wFB/tk5rnthhPb8oIBGoagY=
 github.com/teserakt-io/golang-ed25519 v0.0.0-20210104091850-3888c087a4c8/go.mod h1:9PdLyPiZIiW3UopXyRnPYyjUXSpiQNHRLu8fOsR3o8M=
-github.com/trustbloc/kms-go v1.0.0 h1:uV4J95DXKgpcxEQtRLJ6Aa9nk1CY8cLSUHgSwwzqJIQ=
-github.com/trustbloc/kms-go v1.0.0/go.mod h1:1rvrHRuIRT7qLapB0lSpFgy1CjFunx85EyEzcZpIxG8=
+github.com/trustbloc/bbs-signature-go v1.0.0 h1:JOKmPRTpjbbGODt71i3wJyiEBcu5XEoeSMQaM0WHR7Q=
+github.com/trustbloc/bbs-signature-go v1.0.0/go.mod h1:8xptu/lbVUDACQW10yiHtqATzC2kpTKQk5mKsKTD85Y=
+github.com/trustbloc/kms-go v1.0.1-0.20230922134356-24e819a06a30 h1:nNmYk/CX3UrLe4a7qCaMjsc+IWcQdZlJGvY5D2gsewE=
+github.com/trustbloc/kms-go v1.0.1-0.20230922134356-24e819a06a30/go.mod h1:7arOSG9GewtV1WiqYZ23dSZ6haamosSABwyG//cRaXQ=
 github.com/trustbloc/logutil-go v1.0.0-rc1 h1:rRJbvgQfrlUfyej+mY0nuQJymGqjRW4oZEwKi544F4c=
 github.com/trustbloc/logutil-go v1.0.0-rc1/go.mod h1:JlxT0oZfNKgIlSNtgc001WEeDMxlnAvOM43gNm8DQVc=
 github.com/trustbloc/sidetree-core-go v1.0.0 h1:kzfKZOJ0sgDy9D1AYNcoR3JHutqtMtKvF2P9UwUcDjU=
