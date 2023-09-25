@@ -17,14 +17,14 @@ const (
     "oneOf": [
       {
         "type": "string",
-        "pattern": "^https://(w3id.org|www.w3.org/ns)/did/v1$"
+        "pattern": "^https://(w3id.org|www.w3.org/ns|w3.org/ns)/did/v1$"
       },
       {
         "type": "array",
         "items": [
           {
             "type": "string",
-            "pattern": "^https://(w3id.org|www.w3.org/ns)/did/v1$"
+            "pattern": "^https://(w3id.org|www.w3.org/ns|w3.org/ns)/did/v1$"
           }
         ],
         "uniqueItems": true,
