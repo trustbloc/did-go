@@ -18,11 +18,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/trustbloc/sidetree-core-go/pkg/commitment"
-	"github.com/trustbloc/sidetree-core-go/pkg/hashing"
-	"github.com/trustbloc/sidetree-core-go/pkg/patch"
-	"github.com/trustbloc/sidetree-core-go/pkg/util/pubkey"
-	"github.com/trustbloc/sidetree-core-go/pkg/versions/1_0/client"
+	"github.com/trustbloc/sidetree-go/pkg/commitment"
+	"github.com/trustbloc/sidetree-go/pkg/hashing"
+	"github.com/trustbloc/sidetree-go/pkg/patch"
+	"github.com/trustbloc/sidetree-go/pkg/util/pubkey"
+	"github.com/trustbloc/sidetree-go/pkg/versions/1_0/client"
 
 	docdid "github.com/trustbloc/did-go/doc/did"
 	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree/doc"

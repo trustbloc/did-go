@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/trustbloc/sidetree-core-go/pkg/api/protocol"
+	"github.com/trustbloc/sidetree-go/pkg/api/protocol"
 
 	vercommon "github.com/trustbloc/did-go/method/sidetreelongform/dochandler/protocolversion/common"
 	"github.com/trustbloc/did-go/method/sidetreelongform/dochandler/protocolversion/versions/common"

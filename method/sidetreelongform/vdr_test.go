@@ -22,7 +22,7 @@ import (
 	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree/option/create"
 	"github.com/trustbloc/kms-go/doc/jose/jwk"
 	"github.com/trustbloc/kms-go/doc/jose/jwk/jwksupport"
-	"github.com/trustbloc/sidetree-core-go/pkg/document"
+	"github.com/trustbloc/sidetree-go/pkg/document"
 
 	ariesdid "github.com/trustbloc/did-go/doc/did"
 	model "github.com/trustbloc/did-go/doc/did/endpoint"

@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/require"
 	jwkapi "github.com/trustbloc/kms-go/doc/jose/jwk"
 	"github.com/trustbloc/kms-go/doc/jose/jwk/jwksupport"
-	"github.com/trustbloc/sidetree-core-go/pkg/canonicalizer"
+	"github.com/trustbloc/sidetree-go/pkg/canonicalizer"
 
 	"github.com/trustbloc/did-go/doc/did"
 	"github.com/trustbloc/did-go/method/jwk"
