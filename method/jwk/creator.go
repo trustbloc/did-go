@@ -11,7 +11,7 @@ import (
 	"fmt"
 
 	"github.com/trustbloc/kms-go/doc/jose/jwk"
-	"github.com/trustbloc/sidetree-core-go/pkg/canonicalizer"
+	"github.com/trustbloc/sidetree-go/pkg/canonicalizer"
 
 	"github.com/trustbloc/did-go/doc/did"
 	vdrapi "github.com/trustbloc/did-go/vdr/api"
