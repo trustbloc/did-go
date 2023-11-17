@@ -17,14 +17,13 @@ require (
 	github.com/stretchr/testify v1.8.2
 	github.com/trustbloc/bbs-signature-go v1.0.1
 	github.com/trustbloc/kms-go v1.0.1-0.20231116141347-14d6bea5727a
-	github.com/trustbloc/sidetree-go v0.0.0-20230928172705-30e78b6b6ddd
+	github.com/trustbloc/sidetree-go v0.0.0-20231117115139-d71ec9786d12
 	github.com/xeipuuv/gojsonschema v1.2.0
 )
 
 require (
 	github.com/IBM/mathlib v0.0.3-0.20231011094432-44ee0eb539da // indirect
 	github.com/bits-and-blooms/bitset v1.7.0 // indirect
-	github.com/btcsuite/btcd v0.22.3 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.1.3 // indirect
 	github.com/consensys/bavard v0.1.13 // indirect
 	github.com/consensys/gnark-crypto v0.12.1 // indirect
