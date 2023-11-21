@@ -108,10 +108,10 @@ github.com/teserakt-io/golang-ed25519 v0.0.0-20210104091850-3888c087a4c8 h1:RBka
 github.com/teserakt-io/golang-ed25519 v0.0.0-20210104091850-3888c087a4c8/go.mod h1:9PdLyPiZIiW3UopXyRnPYyjUXSpiQNHRLu8fOsR3o8M=
 github.com/trustbloc/bbs-signature-go v1.0.1 h1:Nv/DCGVMQiY27dV0mD4U4924jGAnru/u3V+/QWivm8c=
 github.com/trustbloc/bbs-signature-go v1.0.1/go.mod h1:gjYaYD+/wqBsA0IIdZBoCKSNKPXi775J2LE45u6pX+8=
-github.com/trustbloc/kms-go v1.0.1-0.20231116141347-14d6bea5727a h1:o5QJVGWEZFHJKu1IKV6ucVVTVdzhmnnTzo5Wa+u57es=
-github.com/trustbloc/kms-go v1.0.1-0.20231116141347-14d6bea5727a/go.mod h1:FEo4tIRWv7zNwgZsWZ4g10e/gOkJL5ybQtSrY2UdOXM=
-github.com/trustbloc/sidetree-go v0.0.0-20231117115139-d71ec9786d12 h1:e701OxbML1BEu0MnlhqPl4Z1YC/ZR0EJb4oFPUYv2k0=
-github.com/trustbloc/sidetree-go v0.0.0-20231117115139-d71ec9786d12/go.mod h1:P8KNf/BjWYRbFIJUq+KRd1rtukk5G4NjTc0RqqA0ekc=
+github.com/trustbloc/kms-go v1.1.0 h1:npKO9hLrE1GbLmVw0Trpkiad5xNnSRmmhUk+80qYe0A=
+github.com/trustbloc/kms-go v1.1.0/go.mod h1:FEo4tIRWv7zNwgZsWZ4g10e/gOkJL5ybQtSrY2UdOXM=
+github.com/trustbloc/sidetree-go v1.0.0 h1:bN9s7d73jAEtEfUxRZVSNspv6vbPFxF0nnwBXiworkU=
+github.com/trustbloc/sidetree-go v1.0.0/go.mod h1:P8KNf/BjWYRbFIJUq+KRd1rtukk5G4NjTc0RqqA0ekc=
 github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f/go.mod h1:N2zxlSyiKSe5eX1tZViRH5QA0qijqEDrYZiPEAiq3wU=
 github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb h1:zGWFAtiMcyryUHoUjUJX0/lt1H2+i2Ka2n+D3DImSNo=
 github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb/go.mod h1:N2zxlSyiKSe5eX1tZViRH5QA0qijqEDrYZiPEAiq3wU=

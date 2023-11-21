@@ -16,8 +16,8 @@ require (
 	github.com/piprate/json-gold v0.5.1-0.20230111113000-6ddbe6e6f19f
 	github.com/stretchr/testify v1.8.2
 	github.com/trustbloc/bbs-signature-go v1.0.1
-	github.com/trustbloc/kms-go v1.0.1-0.20231116141347-14d6bea5727a
-	github.com/trustbloc/sidetree-go v0.0.0-20231117115139-d71ec9786d12
+	github.com/trustbloc/kms-go v1.1.0
+	github.com/trustbloc/sidetree-go v1.0.0
 	github.com/xeipuuv/gojsonschema v1.2.0
 )
 
