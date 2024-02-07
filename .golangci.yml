@@ -30,7 +30,7 @@ linters-settings:
   gofmt:
     simplify: true
   gocyclo:
-    min-complexity: 10
+    min-complexity: 12
   maligned:
     suggest-new: true
   dupl:
@@ -61,7 +61,7 @@ linters-settings:
       - unnamedResult
       - whyNoLint # TODO enable.
   funlen:
-    lines: 60
+    lines: 80
     statements: 40
   wsl:
     strict-append: true

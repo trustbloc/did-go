@@ -10,8 +10,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/trustbloc/kms-go/doc/util/fingerprint"
 	"github.com/trustbloc/kms-go/util/cryptoutil"
+
+	"github.com/trustbloc/did-go/crypto-ext/jwksupport"
+	"github.com/trustbloc/did-go/doc/fingerprint"
 
 	"github.com/trustbloc/did-go/doc/did"
 	vdrapi "github.com/trustbloc/did-go/vdr/api"
@@ -50,7 +52,13 @@ func (v *VDR) Create(didDoc *did.Doc, opts ...vdrapi.DIDMethodOption) (*did.DocR
 
 	switch didDoc.VerificationMethod[0].Type {
 	case jsonWebKey2020:
-		didKey, keyID, err = fingerprint.CreateDIDKeyByJwk(didDoc.VerificationMethod[0].JSONWebKey())
+		didKey, keyID, err = jwksupport.CreateDIDKeyByJwk(didDoc.VerificationMethod[0].JSONWebKey())
+		if err != nil {
+			return nil, err
+		}
+
+		publicKey, err = did.NewVerificationMethodFromJWK(keyID, didDoc.VerificationMethod[0].Type, didKey,
+			didDoc.VerificationMethod[0].JSONWebKey())
 		if err != nil {
 			return nil, err
 		}
@@ -61,10 +69,10 @@ func (v *VDR) Create(didDoc *did.Doc, opts ...vdrapi.DIDMethodOption) (*did.DocR
 		}
 
 		didKey, keyID = fingerprint.CreateDIDKeyByCode(keyCode, didDoc.VerificationMethod[0].Value)
-	}
 
-	publicKey = did.NewVerificationMethodFromBytes(keyID, didDoc.VerificationMethod[0].Type, didKey,
-		didDoc.VerificationMethod[0].Value)
+		publicKey = did.NewVerificationMethodFromBytes(keyID, didDoc.VerificationMethod[0].Type, didKey,
+			didDoc.VerificationMethod[0].Value)
+	}
 
 	if didDoc.VerificationMethod[0].Type == ed25519VerificationKey2018 {
 		keyAgr, err = keyAgreementFromEd25519(didKey, didDoc.VerificationMethod[0].Value)

@@ -346,7 +346,7 @@ func getSidetreePublicKeys(didDoc *docdid.Doc) (map[string]*pk, error) { //nolin
 					ID:       id,
 					Type:     v.VerificationMethod.Type,
 					Purposes: []string{purpose},
-					JWK:      *v.VerificationMethod.JSONWebKey(),
+					JWK:      v.VerificationMethod.JSONWebKey(),
 				},
 				value: v.VerificationMethod.Value,
 			}

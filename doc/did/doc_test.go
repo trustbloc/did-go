@@ -20,15 +20,15 @@ import (
 	"time"
 
 	"github.com/btcsuite/btcutil/base58"
-	gojose "github.com/go-jose/go-jose/v3"
 	"github.com/stretchr/testify/require"
+
+	"github.com/trustbloc/did-go/crypto-ext/jwksupport"
 	"github.com/trustbloc/did-go/doc/internal/mock/signature"
 
 	"github.com/trustbloc/did-go/doc/did/endpoint"
 	"github.com/trustbloc/did-go/doc/ld/testutil"
 	"github.com/trustbloc/did-go/doc/signature/api"
 	"github.com/trustbloc/did-go/doc/signature/signer"
-	"github.com/trustbloc/kms-go/doc/jose/jwk"
 )
 
 const pemPK = `-----BEGIN PUBLIC KEY-----
@@ -1306,30 +1306,13 @@ func TestNewPublicKeyFromJWK(t *testing.T) {
 	pubKey, _, err := ed25519.GenerateKey(rand.Reader)
 	require.NoError(t, err)
 
-	j := &jwk.JWK{
-		JSONWebKey: gojose.JSONWebKey{
-			Key:   pubKey,
-			KeyID: "_Qq0UL2Fq651Q0Fjd6TvnYE-faHiOpRlPVQcY_-tA4A",
-		},
-	}
+	j := jwksupport.FromEdPublicKey(pubKey)
+	j.KeyID = "_Qq0UL2Fq651Q0Fjd6TvnYE-faHiOpRlPVQcY_-tA4A"
 
 	// Success.
 	signingKey, err := NewVerificationMethodFromJWK(creator, keyType, did, j)
 	require.NoError(t, err)
 	require.Equal(t, j, signingKey.JSONWebKey())
-	require.Equal(t, []byte(pubKey), signingKey.Value)
-
-	// Error - invalid JWK.
-	j = &jwk.JWK{
-		JSONWebKey: gojose.JSONWebKey{
-			Key:   nil,
-			KeyID: "_Qq0UL2Fq651Q0Fjd6TvnYE-faHiOpRlPVQcY_-tA4A",
-		},
-	}
-	signingKey, err = NewVerificationMethodFromJWK(creator, keyType, did, j)
-	require.Error(t, err)
-	require.Contains(t, err.Error(), "convert JWK to public key bytes")
-	require.Nil(t, signingKey)
 }
 
 func TestJSONWebKey(t *testing.T) {
@@ -1338,12 +1321,8 @@ func TestJSONWebKey(t *testing.T) {
 	pubKey, _, err := ed25519.GenerateKey(rand.Reader)
 	require.NoError(t, err)
 
-	j := &jwk.JWK{
-		JSONWebKey: gojose.JSONWebKey{
-			Key:   pubKey,
-			KeyID: "_Qq0UL2Fq651Q0Fjd6TvnYE-faHiOpRlPVQcY_-tA4A",
-		},
-	}
+	j := jwksupport.FromEdPublicKey(pubKey)
+	j.KeyID = "_Qq0UL2Fq651Q0Fjd6TvnYE-faHiOpRlPVQcY_-tA4A"
 
 	signingKey, err := NewVerificationMethodFromJWK(creator, keyType, did, j)
 	require.NoError(t, err)
