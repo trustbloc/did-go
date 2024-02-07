@@ -21,8 +21,9 @@ import (
 
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/multiformats/go-multibase"
-	"github.com/trustbloc/kms-go/doc/jose/jwk"
 	"github.com/xeipuuv/gojsonschema"
+
+	"github.com/trustbloc/did-go/doc/jose/jwk"
 
 	"github.com/trustbloc/did-go/doc/did/endpoint"
 	"github.com/trustbloc/did-go/doc/ld/processor"
@@ -348,11 +349,6 @@ func NewVerificationMethodFromBytes(id, keyType, controller string, value []byte
 
 // NewVerificationMethodFromJWK creates a new VerificationMethod based on JSON Web Key.
 func NewVerificationMethodFromJWK(id, keyType, controller string, j *jwk.JWK) (*VerificationMethod, error) {
-	pkBytes, err := j.PublicKeyBytes()
-	if err != nil {
-		return nil, fmt.Errorf("convert JWK to public key bytes: %w", err)
-	}
-
 	relativeURL := false
 	if strings.HasPrefix(id, "#") {
 		relativeURL = true
@@ -362,7 +358,6 @@ func NewVerificationMethodFromJWK(id, keyType, controller string, j *jwk.JWK) (*
 		ID:          id,
 		Type:        keyType,
 		Controller:  controller,
-		Value:       pkBytes,
 		jsonWebKey:  j,
 		relativeURL: relativeURL,
 	}, nil
@@ -962,12 +957,6 @@ func decodeVMJwk(jwkMap map[string]interface{}, vm *VerificationMethod) error {
 		return fmt.Errorf("unmarshal JWK: %w", err)
 	}
 
-	pkBytes, err := j.PublicKeyBytes()
-	if err != nil {
-		return fmt.Errorf("failed to decode public key from JWK: %w", err)
-	}
-
-	vm.Value = pkBytes
 	vm.jsonWebKey = &j
 
 	return nil

@@ -7,7 +7,6 @@ SPDX-License-Identifier: Apache-2.0
 package key
 
 import (
-	"crypto/ecdsa"
 	"crypto/ed25519"
 	"crypto/elliptic"
 	"math/big"
@@ -15,9 +14,10 @@ import (
 
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/stretchr/testify/require"
-	"github.com/trustbloc/kms-go/doc/jose/jwk/jwksupport"
 
+	"github.com/trustbloc/did-go/crypto-ext/jwksupport"
 	"github.com/trustbloc/did-go/doc/did"
+	"github.com/trustbloc/did-go/doc/jose/jwk"
 )
 
 func TestBuild(t *testing.T) {
@@ -81,12 +81,12 @@ func TestBuild(t *testing.T) {
 
 		x, y := elliptic.Unmarshal(elliptic.P256(), base58.Decode(pubKeyBase58P256))
 		require.NotNil(t, x, "error parsing pubKeyBase58P256 public key")
-		key := ecdsa.PublicKey{
+		ecdsaContent := jwksupport.EcdsaContent{
 			Curve: elliptic.P256(),
 			X:     x,
 			Y:     y,
 		}
-		j, err := jwksupport.JWKFromKey(&key)
+		j, err := jwksupport.FromEcdsaContent(ecdsaContent)
 		require.NoError(t, err, "error creating JWK from public key: %v", err)
 
 		vm, err := did.NewVerificationMethodFromJWK("id", jsonWebKey2020, "", j)
@@ -110,12 +110,12 @@ func TestBuild(t *testing.T) {
 
 		x, y := elliptic.Unmarshal(elliptic.P384(), base58.Decode(pubKeyBase58P384))
 		require.NotNil(t, x, "error parsing pubKeyBase58P384 public key")
-		key := ecdsa.PublicKey{
+		ecdsaContent := jwksupport.EcdsaContent{
 			Curve: elliptic.P384(),
 			X:     x,
 			Y:     y,
 		}
-		j, err := jwksupport.JWKFromKey(&key)
+		j, err := jwksupport.FromEcdsaContent(ecdsaContent)
 		require.NoError(t, err, "error creating JWK from public key: %v", err)
 
 		vm, err := did.NewVerificationMethodFromJWK("id", jsonWebKey2020, "", j)
@@ -139,12 +139,12 @@ func TestBuild(t *testing.T) {
 
 		x, y := elliptic.Unmarshal(elliptic.P521(), base58.Decode(pubKeyBase58P521))
 		require.NotNil(t, x, "error parsing pubKeyBase58P521 public key")
-		key := ecdsa.PublicKey{
+		ecdsaContent := jwksupport.EcdsaContent{
 			Curve: elliptic.P521(),
 			X:     x,
 			Y:     y,
 		}
-		j, err := jwksupport.JWKFromKey(&key)
+		j, err := jwksupport.FromEcdsaContent(ecdsaContent)
 		require.NoError(t, err, "error creating JWK from public key: %v", err)
 
 		vm, err := did.NewVerificationMethodFromJWK("id", jsonWebKey2020, "", j)
@@ -224,8 +224,7 @@ func assertP256Doc(t *testing.T, doc *did.Doc) {
 		pubKeyBase58 = "Q1sFNywhsHf5Wds93YN1b97jrFiUQchN3nDgboS64kqzbTrPNN6ESCibhyNEidDMHa6M1V43dVeiFpBaUa4RXxMa"
 	)
 
-	assertDualBase58Doc(t, doc, didKey, didKeyID, jsonWebKey2020, pubKeyBase58,
-		"", "", "")
+	assertJWKDoc(t, doc, didKey, didKeyID, jsonWebKey2020, parseECDSAPubKey(t, pubKeyBase58, elliptic.P256()))
 }
 
 func assertP384Doc(t *testing.T, doc *did.Doc) {
@@ -236,8 +235,7 @@ func assertP384Doc(t *testing.T, doc *did.Doc) {
 		pubKeyBase58 = "7xunFyusHxhJS3tbNWcX7xHCLRPnsScaBJJQUWw8KPpTTPfUSw9RbdyQYCBaLopw6eVQJv1G4ZD4EWgnE3zmkuiGHTq5y1KAwPAUv9Q4XXBricnzAxKamSHJiX29uQqGtbux"                    //nolint:lll
 	)
 
-	assertDualBase58Doc(t, doc, didKey, didKeyID, jsonWebKey2020, pubKeyBase58,
-		"", "", "")
+	assertJWKDoc(t, doc, didKey, didKeyID, jsonWebKey2020, parseECDSAPubKey(t, pubKeyBase58, elliptic.P384()))
 }
 
 func assertP521Doc(t *testing.T, doc *did.Doc) {
@@ -248,8 +246,7 @@ func assertP521Doc(t *testing.T, doc *did.Doc) {
 		pubKeyBase58 = "CqTBHvN1FwpkcrhNddXM3zSZRF7rUNSCCBuPWRxBmNAGBMa91by5XebadFwGJ2d1AVJMbUUKmUiBGXaCDDVEDn5fthbSBosoFG4anpQextGkuHHJohZxeLrGuyHc4JZYGyWFbAXVRKTMFRxuF8eQ88zqvjEV6k8oNbQ6vELYFp9CjQudG7cqP"                     //nolint:lll
 	)
 
-	assertDualBase58Doc(t, doc, didKey, didKeyID, jsonWebKey2020, pubKeyBase58,
-		"", "", "")
+	assertJWKDoc(t, doc, didKey, didKeyID, jsonWebKey2020, parseECDSAPubKey(t, pubKeyBase58, elliptic.P521()))
 }
 
 func assertBase58Doc(t *testing.T, doc *did.Doc, didKey, didKeyID, didKeyType, pubKeyBase58 string) {
@@ -311,6 +308,49 @@ func assertDualBase58Doc(t *testing.T, doc *did.Doc, didKey, didKeyID, didKeyTyp
 	}
 }
 
+func assertJWKDoc(t *testing.T, doc *did.Doc, didKey, didKeyID, didKeyType string, pubJWK *jwk.JWK) {
+	var context string
+	switch ctx := doc.Context.(type) {
+	case string:
+		context = ctx
+	case []string:
+		context = ctx[0]
+	case []interface{}:
+		var ok bool
+		context, ok = ctx[0].(string)
+		require.True(t, ok)
+	}
+
+	// validate @context
+	require.Equal(t, schemaDIDV1, context)
+
+	// validate id
+	require.Equal(t, didKey, doc.ID)
+
+	expectedPubKey, err := did.NewVerificationMethodFromJWK(
+		didKeyID,
+		didKeyType,
+		didKey,
+		pubJWK,
+	)
+	require.NoError(t, err)
+
+	// validate publicKey
+	assertPubKey(t, expectedPubKey, &doc.VerificationMethod[0])
+
+	// validate assertionMethod
+	assertPubKey(t, expectedPubKey, &doc.AssertionMethod[0].VerificationMethod)
+
+	// validate authentication
+	assertPubKey(t, expectedPubKey, &doc.Authentication[0].VerificationMethod)
+
+	// validate capabilityDelegation
+	assertPubKey(t, expectedPubKey, &doc.CapabilityDelegation[0].VerificationMethod)
+
+	// validate capabilityInvocation
+	assertPubKey(t, expectedPubKey, &doc.CapabilityInvocation[0].VerificationMethod)
+}
+
 func assertPubKey(t *testing.T, expectedPubKey, actualPubKey *did.VerificationMethod) {
 	require.NotNil(t, actualPubKey)
 	require.Equal(t, expectedPubKey.ID, actualPubKey.ID)
@@ -327,12 +367,12 @@ func assertJSONWebKeyDoc(t *testing.T, doc *did.Doc, didKey, didKeyID string,
 
 func createVerificationMethodFromXAndY(t *testing.T, didKeyID, didKey string,
 	curve elliptic.Curve, x, y *big.Int) *did.VerificationMethod {
-	publicKey := ecdsa.PublicKey{
+	ecdsaContent := jwksupport.EcdsaContent{
 		Curve: curve,
 		X:     x,
 		Y:     y,
 	}
-	j, err := jwksupport.JWKFromKey(&publicKey)
+	j, err := jwksupport.FromEcdsaContent(ecdsaContent)
 	require.Nil(t, err, "error creating expected JWK from public key %w", err)
 
 	verificationMethod, err := did.NewVerificationMethodFromJWK(didKeyID, jsonWebKey2020, didKey, j)
@@ -399,11 +439,21 @@ func assertPubJSONWebKey(t *testing.T, expectedPubKey, actualPubKey *did.Verific
 	require.Equal(t, expectedPubKey.JSONWebKey().Kty, actualPubKey.JSONWebKey().Kty)
 	require.Equal(t, expectedPubKey.JSONWebKey().Crv, actualPubKey.JSONWebKey().Crv)
 
-	expectedEcdsa, ok := expectedPubKey.JSONWebKey().Key.(*ecdsa.PublicKey)
-	require.True(t, ok, "unexpected key type")
-	actualEcdsa, ok := actualPubKey.JSONWebKey().Key.(*ecdsa.PublicKey)
-	require.True(t, ok, "unexpected key type")
+	require.Equal(t, expectedPubKey.JSONWebKey().X, actualPubKey.JSONWebKey().X, "incorrect X")
+	require.Equal(t, expectedPubKey.JSONWebKey().Y, actualPubKey.JSONWebKey().Y, "incorrect Y")
+}
 
-	require.Equal(t, expectedEcdsa.X, actualEcdsa.X, "incorrect X")
-	require.Equal(t, expectedEcdsa.Y, actualEcdsa.Y, "incorrect Y")
+func parseECDSAPubKey(t *testing.T, pubKeyBase58 string, curve elliptic.Curve) *jwk.JWK {
+	x, y := elliptic.Unmarshal(curve, base58.Decode(pubKeyBase58))
+	require.NotNil(t, x, "error parsing pubKeyBase58P256 public key")
+	ecdsaContent := jwksupport.EcdsaContent{
+		Curve: curve,
+		X:     x,
+		Y:     y,
+	}
+
+	jwk, err := jwksupport.FromEcdsaContent(ecdsaContent)
+	require.NoError(t, err, "error creating JWK from public key: %v", err)
+
+	return jwk
 }

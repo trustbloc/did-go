@@ -6,7 +6,6 @@ SPDX-License-Identifier: Apache-2.0
 package sidetreelongform
 
 import (
-	"crypto/ecdsa"
 	"crypto/ed25519"
 	"crypto/elliptic"
 	"crypto/rand"
@@ -16,13 +15,14 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/trustbloc/bbs-signature-go/bbs12381g2pub"
+	"github.com/trustbloc/sidetree-go/pkg/document"
+
+	"github.com/trustbloc/did-go/crypto-ext/jwksupport"
+	"github.com/trustbloc/did-go/doc/jose/jwk"
 	ld "github.com/trustbloc/did-go/doc/ld/documentloader"
 	mockldstore "github.com/trustbloc/did-go/doc/ld/mock"
 	ldstore "github.com/trustbloc/did-go/doc/ld/store"
 	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree/option/create"
-	"github.com/trustbloc/kms-go/doc/jose/jwk"
-	"github.com/trustbloc/kms-go/doc/jose/jwk/jwksupport"
-	"github.com/trustbloc/sidetree-go/pkg/document"
 
 	ariesdid "github.com/trustbloc/did-go/doc/did"
 	model "github.com/trustbloc/did-go/doc/did/endpoint"
@@ -471,14 +471,14 @@ func createVerificationMethod(keyType string, pubKey []byte, kid,
 	case p256KeyType:
 		x, y := elliptic.Unmarshal(elliptic.P256(), pubKey)
 
-		j, err = jwksupport.JWKFromKey(&ecdsa.PublicKey{X: x, Y: y, Curve: elliptic.P256()})
+		j, err = jwksupport.FromEcdsaContent(jwksupport.EcdsaContent{X: x, Y: y, Curve: elliptic.P256()})
 		if err != nil {
 			return nil, err
 		}
 	case p384KeyType:
 		x, y := elliptic.Unmarshal(elliptic.P384(), pubKey)
 
-		j, err = jwksupport.JWKFromKey(&ecdsa.PublicKey{X: x, Y: y, Curve: elliptic.P384()})
+		j, err = jwksupport.FromEcdsaContent(jwksupport.EcdsaContent{X: x, Y: y, Curve: elliptic.P384()})
 		if err != nil {
 			return nil, err
 		}
@@ -488,15 +488,12 @@ func createVerificationMethod(keyType string, pubKey []byte, kid,
 			return nil, e
 		}
 
-		j, err = jwksupport.JWKFromKey(pk)
+		j, err = jwksupport.FromBLS12381G2(pk)
 		if err != nil {
 			return nil, err
 		}
 	default:
-		j, err = jwksupport.JWKFromKey(ed25519.PublicKey(pubKey))
-		if err != nil {
-			return nil, err
-		}
+		j = jwksupport.FromEdPublicKey(pubKey)
 	}
 
 	return ariesdid.NewVerificationMethodFromJWK(kid, signatureSuite, "", j)

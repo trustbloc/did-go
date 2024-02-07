@@ -13,9 +13,10 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	jwkapi "github.com/trustbloc/kms-go/doc/jose/jwk"
-	"github.com/trustbloc/kms-go/doc/jose/jwk/jwksupport"
 	"github.com/trustbloc/sidetree-go/pkg/canonicalizer"
+
+	"github.com/trustbloc/did-go/crypto-ext/jwksupport"
+	jwkapi "github.com/trustbloc/did-go/doc/jose/jwk"
 
 	"github.com/trustbloc/did-go/doc/did"
 	"github.com/trustbloc/did-go/method/jwk"
@@ -121,8 +122,7 @@ func TestCreate(t *testing.T) {
 		_, pk, err := ed25519.GenerateKey(rand.Reader)
 		require.NoError(t, err)
 
-		key, err := jwksupport.JWKFromKey(pk)
-		require.NoError(t, err)
+		key := jwksupport.FromEdPrivateKey(pk)
 
 		vm, err := did.NewVerificationMethodFromJWK("", "JsonWebKey2020", "", key)
 		require.NoError(t, err)

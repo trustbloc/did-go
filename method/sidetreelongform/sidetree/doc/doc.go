@@ -11,7 +11,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/trustbloc/kms-go/doc/jose/jwk"
+	"github.com/trustbloc/did-go/doc/jose/jwk"
 
 	docdid "github.com/trustbloc/did-go/doc/did"
 )
@@ -68,7 +68,7 @@ type PublicKey struct {
 	ID       string
 	Type     string
 	Purposes []string
-	JWK      jwk.JWK
+	JWK      *jwk.JWK
 	B58Key   string
 }
 
@@ -122,25 +122,28 @@ func populateRawPublicKey(pk *PublicKey) (map[string]interface{}, error) {
 	rawPK[jsonldType] = pk.Type
 	rawPK[jsonldPurposes] = pk.Purposes
 
-	jwkBytes, err := pk.JWK.MarshalJSON()
-
 	switch {
-	case err == nil:
+	case pk.JWK != nil:
+		jwkBytes, err := json.Marshal(pk.JWK)
+		if err != nil {
+			return nil, fmt.Errorf("jwk marshaling failed: %w", err)
+		}
+
 		rawJWK := make(map[string]interface{})
 		if err := json.Unmarshal(jwkBytes, &rawJWK); err != nil {
 			return nil, err
 		}
 
 		rawPK[jsonldPublicKeyJwk] = rawJWK
-	case pk.Type == JWK2020Type:
-		return nil, fmt.Errorf("no valid jwk in JsonWebKey2020 key")
+
+		return rawPK, nil
 	case pk.B58Key != "":
 		rawPK[jsonldPublicKeyBase58] = pk.B58Key
+
+		return rawPK, nil
 	default:
 		return nil, fmt.Errorf("public key must contain either a jwk or base58 key")
 	}
-
-	return rawPK, nil
 }
 
 // PopulateRawServices populate raw services.

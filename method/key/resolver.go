@@ -7,15 +7,13 @@ SPDX-License-Identifier: Apache-2.0
 package key
 
 import (
-	"crypto/ecdsa"
 	"crypto/elliptic"
 	"fmt"
 	"regexp"
 
-	"github.com/trustbloc/kms-go/doc/jose/jwk/jwksupport"
-	"github.com/trustbloc/kms-go/doc/util/fingerprint"
-
+	"github.com/trustbloc/did-go/crypto-ext/jwksupport"
 	"github.com/trustbloc/did-go/doc/did"
+	"github.com/trustbloc/did-go/doc/fingerprint"
 	vdrapi "github.com/trustbloc/did-go/vdr/api"
 )
 
@@ -89,18 +87,7 @@ func createJSONWebKey2020DIDDoc(kid string, code uint64, pubKeyBytes []byte) (*d
 		return nil, fmt.Errorf("unsupported key multicodec code for JsonWebKey2020 [0x%x]", code)
 	}
 
-	x, y := elliptic.UnmarshalCompressed(curve, pubKeyBytes)
-	if x == nil {
-		return nil, fmt.Errorf("error unmarshalling key bytes")
-	}
-
-	publicKey := ecdsa.PublicKey{
-		Curve: curve,
-		X:     x,
-		Y:     y,
-	}
-
-	j, err := jwksupport.JWKFromKey(&publicKey)
+	j, err := jwksupport.FromEcdsaPubKeyBytes(curve, pubKeyBytes)
 	if err != nil {
 		return nil, fmt.Errorf("error creating JWK %w", err)
 	}

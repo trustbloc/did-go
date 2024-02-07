@@ -18,9 +18,7 @@ import (
 	"testing"
 
 	"github.com/btcsuite/btcutil/base58"
-	gojose "github.com/go-jose/go-jose/v3"
 	"github.com/stretchr/testify/require"
-	"github.com/trustbloc/kms-go/doc/jose/jwk"
 	"github.com/trustbloc/sidetree-go/pkg/commitment"
 	"github.com/trustbloc/sidetree-go/pkg/jws"
 	"github.com/trustbloc/sidetree-go/pkg/util/ecsigner"
@@ -28,6 +26,7 @@ import (
 	"github.com/trustbloc/sidetree-go/pkg/util/pubkey"
 	"github.com/trustbloc/sidetree-go/pkg/versions/1_0/client"
 
+	"github.com/trustbloc/did-go/crypto-ext/jwksupport"
 	"github.com/trustbloc/did-go/doc/did"
 	model "github.com/trustbloc/did-go/doc/did/endpoint"
 	"github.com/trustbloc/did-go/method/sidetreelongform/sidetree"
@@ -239,7 +238,7 @@ func TestClient_RecoverDID(t *testing.T) {
 			recovery.WithNextUpdatePublicKey(pubKey), recovery.WithPublicKey(&doc.PublicKey{
 				ID:   "key3",
 				Type: doc.Ed25519VerificationKey2018,
-				JWK:  jwk.JWK{JSONWebKey: gojose.JSONWebKey{Key: pubKey}},
+				JWK:  jwksupport.FromEdPublicKey(pubKey),
 			}))
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "sidetree get endpoints func is required")
@@ -252,7 +251,7 @@ func TestClient_RecoverDID(t *testing.T) {
 			recovery.WithNextUpdatePublicKey(pubKey), recovery.WithPublicKey(&doc.PublicKey{
 				ID:   "key3",
 				Type: doc.Ed25519VerificationKey2018,
-				JWK:  jwk.JWK{JSONWebKey: gojose.JSONWebKey{Key: pubKey}},
+				JWK:  jwksupport.FromEdPublicKey(pubKey),
 			}),
 			recovery.WithSidetreeEndpoint(func(disableCache bool) ([]string, error) {
 				i++
@@ -334,7 +333,6 @@ func TestClient_RecoverDID(t *testing.T) {
 			}), recovery.WithNextUpdatePublicKey(pubKey), recovery.WithPublicKey(&doc.PublicKey{
 				ID:   "key3",
 				Type: doc.JWSVerificationKey2020,
-				JWK:  jwk.JWK{},
 			}))
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "public key must contain either a jwk or base58 key")
@@ -368,7 +366,7 @@ func TestClient_RecoverDID(t *testing.T) {
 			recovery.WithNextUpdatePublicKey(pubKey), recovery.WithPublicKey(&doc.PublicKey{
 				ID:   "key3",
 				Type: doc.Ed25519VerificationKey2018,
-				JWK:  jwk.JWK{JSONWebKey: gojose.JSONWebKey{Key: pubKey}},
+				JWK:  jwksupport.FromEdPublicKey(pubKey),
 			}),
 			recovery.WithService(&did.Service{ID: "svc3"}))
 		require.Error(t, err)
@@ -392,7 +390,7 @@ func TestClient_RecoverDID(t *testing.T) {
 			recovery.WithNextUpdatePublicKey(pubKey), recovery.WithPublicKey(&doc.PublicKey{
 				ID:   "key3",
 				Type: doc.Ed25519VerificationKey2018,
-				JWK:  jwk.JWK{JSONWebKey: gojose.JSONWebKey{Key: pubKey}},
+				JWK:  jwksupport.FromEdPublicKey(pubKey),
 			}),
 			recovery.WithService(&did.Service{ID: "svc3"}))
 		require.Error(t, err)
@@ -434,7 +432,7 @@ func TestClient_RecoverDID(t *testing.T) {
 			recovery.WithNextUpdatePublicKey(pubKey), recovery.WithPublicKey(&doc.PublicKey{
 				ID:   "key3",
 				Type: doc.Ed25519VerificationKey2018,
-				JWK:  jwk.JWK{JSONWebKey: gojose.JSONWebKey{Key: pubKey}},
+				JWK:  jwksupport.FromEdPublicKey(pubKey),
 			}),
 			recovery.WithService(&did.Service{ID: "svc3"}),
 			recovery.WithAlsoKnownAs("firstIdentityURI"),
@@ -539,16 +537,15 @@ func TestClient_UpdateDID(t *testing.T) {
 			}),
 		}
 
-		t.Run("public key error: no jwk in JsonWebKey2020 key", func(t *testing.T) {
+		t.Run("public key error: public key must contain either a jwk or base58 key", func(t *testing.T) {
 			err = v.UpdateDID("did:ex:123", append(defaultOptions,
 				update.WithAddPublicKey(&doc.PublicKey{
-					ID:     "key3",
-					Type:   doc.JWK2020Type,
-					B58Key: base58.Encode(pubKey),
+					ID:   "key3",
+					Type: doc.JWK2020Type,
 				}),
 			)...)
 			require.Error(t, err)
-			require.Contains(t, err.Error(), "no valid jwk in JsonWebKey2020 key")
+			require.Contains(t, err.Error(), "public key must contain either a jwk or base58 key")
 		})
 	})
 
@@ -595,7 +592,7 @@ func TestClient_UpdateDID(t *testing.T) {
 			update.WithRemovePublicKey("k2"), update.WithAddPublicKey(&doc.PublicKey{
 				ID:   "key3",
 				Type: doc.Ed25519VerificationKey2018,
-				JWK:  jwk.JWK{JSONWebKey: gojose.JSONWebKey{Key: pubKey}},
+				JWK:  jwksupport.FromEdPublicKey(pubKey),
 			}),
 			update.WithAddService(&did.Service{ID: "svc3"}))
 		require.Error(t, err)
@@ -619,7 +616,7 @@ func TestClient_UpdateDID(t *testing.T) {
 			update.WithRemovePublicKey("k2"), update.WithAddPublicKey(&doc.PublicKey{
 				ID:   "key3",
 				Type: doc.Ed25519VerificationKey2018,
-				JWK:  jwk.JWK{JSONWebKey: gojose.JSONWebKey{Key: pubKey}},
+				JWK:  jwksupport.FromEdPublicKey(pubKey),
 			}),
 			update.WithAddService(&did.Service{ID: "svc3"}))
 		require.Error(t, err)
@@ -679,7 +676,7 @@ func TestClient_CreateDID(t *testing.T) {
 			create.WithPublicKey(&doc.PublicKey{
 				ID:       "key1",
 				Type:     doc.JWSVerificationKey2020,
-				JWK:      jwk.JWK{JSONWebKey: gojose.JSONWebKey{Key: ed25519RecoveryPubKey}},
+				JWK:      jwksupport.FromEdPublicKey(ed25519RecoveryPubKey),
 				Purposes: []string{doc.KeyPurposeAuthentication},
 			}))
 
@@ -691,7 +688,7 @@ func TestClient_CreateDID(t *testing.T) {
 			create.WithPublicKey(&doc.PublicKey{
 				ID:       "key1",
 				Type:     doc.JWSVerificationKey2020,
-				JWK:      jwk.JWK{JSONWebKey: gojose.JSONWebKey{Key: ed25519RecoveryPubKey}},
+				JWK:      jwksupport.FromEdPublicKey(ed25519RecoveryPubKey),
 				Purposes: []string{doc.KeyPurposeAuthentication},
 			}),
 			create.WithSidetreeEndpoint(func(bool) ([]string, error) {
@@ -796,6 +793,13 @@ func TestClient_CreateDID(t *testing.T) {
 		ecPrivKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 		require.NoError(t, err)
 
+		ecJWK, err := jwksupport.FromEcdsaContent(jwksupport.EcdsaContent{
+			Curve: ecPrivKey.Curve,
+			X:     ecPrivKey.X,
+			Y:     ecPrivKey.Y,
+		})
+		require.NoError(t, err)
+
 		v := sidetree.New(sidetree.WithHTTPClient(&http.Client{}))
 
 		didResol, err := v.CreateDID(create.WithRecoveryPublicKey(ed25519RecoveryPubKey),
@@ -807,13 +811,13 @@ func TestClient_CreateDID(t *testing.T) {
 			create.WithPublicKey(&doc.PublicKey{
 				ID:       "key1",
 				Type:     doc.JWSVerificationKey2020,
-				JWK:      jwk.JWK{JSONWebKey: gojose.JSONWebKey{Key: ed25519RecoveryPubKey}},
+				JWK:      jwksupport.FromEdPublicKey(ed25519RecoveryPubKey),
 				Purposes: []string{doc.KeyPurposeAuthentication},
 			}),
 			create.WithPublicKey(&doc.PublicKey{
 				ID:       "key2",
 				Type:     doc.JWSVerificationKey2020,
-				JWK:      jwk.JWK{JSONWebKey: gojose.JSONWebKey{Key: ecPrivKey.Public()}},
+				JWK:      ecJWK,
 				Purposes: []string{doc.KeyPurposeAuthentication},
 			}),
 			create.WithService(&did.Service{
