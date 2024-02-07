@@ -8,10 +8,12 @@ package jwk
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 
-	"github.com/trustbloc/kms-go/doc/jose/jwk"
 	"github.com/trustbloc/sidetree-go/pkg/canonicalizer"
+
+	"github.com/trustbloc/did-go/doc/jose/jwk"
 
 	"github.com/trustbloc/did-go/doc/did"
 	vdrapi "github.com/trustbloc/did-go/vdr/api"
@@ -47,7 +49,7 @@ func createDID(key *jwk.JWK) (string, error) {
 		return "", fmt.Errorf("missing JWK")
 	}
 
-	keyBytes, err := key.MarshalJSON()
+	keyBytes, err := json.Marshal(key)
 	if err != nil {
 		return "", fmt.Errorf("marshal key: %w", err)
 	}

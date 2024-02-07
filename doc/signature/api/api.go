@@ -9,8 +9,8 @@ package api
 import (
 	"time"
 
+	"github.com/trustbloc/did-go/doc/jose/jwk"
 	"github.com/trustbloc/did-go/doc/ld/proof"
-	"github.com/trustbloc/kms-go/doc/jose/jwk"
 
 	"github.com/trustbloc/did-go/doc/ld/processor"
 )
