@@ -89,10 +89,10 @@ github.com/stretchr/testify v1.8.2 h1:+h33VjcLVPDHtOdpUCuF+7gSuG3yGIftsP1YvFihtJ
 github.com/stretchr/testify v1.8.2/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o6fzry7u4=
 github.com/teserakt-io/golang-ed25519 v0.0.0-20210104091850-3888c087a4c8 h1:RBkacARv7qY5laaXGlF4wFB/tk5rnthhPb8oIBGoagY=
 github.com/teserakt-io/golang-ed25519 v0.0.0-20210104091850-3888c087a4c8/go.mod h1:9PdLyPiZIiW3UopXyRnPYyjUXSpiQNHRLu8fOsR3o8M=
-github.com/trustbloc/bbs-signature-go v1.0.2-0.20240117165819-e99610e107f4 h1:YwwlqncHhg7q3W7TDj4yAM4sr9iZmNX5DfhU3Afpe04=
-github.com/trustbloc/bbs-signature-go v1.0.2-0.20240117165819-e99610e107f4/go.mod h1:xYotcXHAbcE0TO+SteW0J6XI3geQaXq4wdnXR2k+XCU=
-github.com/trustbloc/kms-go v1.1.1-0.20240117181216-c38a74431167 h1:tgzKqzUJRLg0sY/BmHEDpMQ3TZOtC7u1RDYEMPeqnCI=
-github.com/trustbloc/kms-go v1.1.1-0.20240117181216-c38a74431167/go.mod h1:23chV97aYVcT3ihO8xO9+T0KZn9lFGbk2KXhJNaHbXE=
+github.com/trustbloc/bbs-signature-go v1.0.2 h1:gepEsbLiZHv/vva9FKG5gF38mGtOIyGez7desZxiI1o=
+github.com/trustbloc/bbs-signature-go v1.0.2/go.mod h1:xYotcXHAbcE0TO+SteW0J6XI3geQaXq4wdnXR2k+XCU=
+github.com/trustbloc/kms-go v1.1.1 h1:ygw3G1GRz9im0oABpt59ygX/xhhplram9y7V8sVY514=
+github.com/trustbloc/kms-go v1.1.1/go.mod h1:PfwuRTXPwoet6IiS36V03IEE6+S3H1yzDMUyIzhEpKA=
 github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f/go.mod h1:N2zxlSyiKSe5eX1tZViRH5QA0qijqEDrYZiPEAiq3wU=
 github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb h1:zGWFAtiMcyryUHoUjUJX0/lt1H2+i2Ka2n+D3DImSNo=
 github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb/go.mod h1:N2zxlSyiKSe5eX1tZViRH5QA0qijqEDrYZiPEAiq3wU=
