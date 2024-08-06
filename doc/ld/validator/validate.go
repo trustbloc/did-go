@@ -36,6 +36,7 @@ func WithDocumentLoader(jsonldDocumentLoader ld.DocumentLoader) ValidateOpts {
 	}
 }
 
+// WithJSONLDIncludeDetailedStructureDiffOnError option is for including detailed structure diff in error message.
 func WithJSONLDIncludeDetailedStructureDiffOnError() ValidateOpts {
 	return func(opts *validateOpts) {
 		opts.jsonldIncludeDetailedStructureDiffOnError = true
@@ -105,7 +106,7 @@ func ValidateJSONLDMap(docMap map[string]interface{}, options ...ValidateOpts) e
 		errText := "JSON-LD doc has different structure after compaction"
 
 		if opts.jsonldIncludeDetailedStructureDiffOnError {
-			diff, _ := json2.Marshal(mapDiff)
+			diff, _ := json2.Marshal(mapDiff) // nolint:errcheck
 
 			errText = fmt.Sprintf("%s. Details: %v", errText, string(diff))
 		}
@@ -153,11 +154,7 @@ func validateContextURIPosition(contextURIPositions []string, docMap map[string]
 	return nil
 }
 
-type Diff struct {
-	OriginalValue  interface{}
-	CompactedValue interface{}
-}
-
+// nolint: gocyclo
 func mapsHaveSameStructure(
 	originalMap,
 	compactedMap map[string]interface{},
