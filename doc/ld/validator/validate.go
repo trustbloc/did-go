@@ -207,6 +207,10 @@ func mapsHaveSameStructure(
 			diffs[diffKey] = append(diffs[diffKey], &Diff{OriginalValue: v1, CompactedValue: v2})
 		}
 
+		if v2Map == nil {
+			v2Map = make(map[string]interface{})
+		}
+
 		mp := mapsHaveSameStructure(v1Map, v2Map, diffKey)
 		for m1, m2 := range mp {
 			diffs[m1] = append(diffs[m1], m2...)
