@@ -6,13 +6,12 @@ SPDX-License-Identifier: Apache-2.0
 package validator
 
 import (
+	json2 "encoding/json"
 	"errors"
 	"fmt"
 	"reflect"
 	"strings"
 
-	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/piprate/json-gold/ld"
 
 	"github.com/trustbloc/did-go/doc/ld/processor"
@@ -95,8 +94,9 @@ func ValidateJSONLDMap(docMap map[string]interface{}, options ...ValidateOpts) e
 	}
 
 	mapDiff := findMapDiff(docMap, docCompactedMap)
-	if opts.strict && mapDiff != "" {
-		return fmt.Errorf("JSON-LD doc has different structure after compaction. Details: %v", mapDiff)
+	if opts.strict && len(mapDiff) != 0 {
+		diff, _ := json2.Marshal(mapDiff)
+		return fmt.Errorf("JSON-LD doc has different structure after compaction. Details: %v", string(diff))
 	}
 
 	err = validateContextURIPosition(opts.contextURIPositions, docMap)
@@ -139,11 +139,79 @@ func validateContextURIPosition(contextURIPositions []string, docMap map[string]
 	return nil
 }
 
-func findMapDiff(originalMap, compactedMap map[string]interface{}) string {
+type Diff struct {
+	OriginalValue  interface{}
+	CompactedValue interface{}
+}
+
+func mapsHaveSameStructure(
+	originalMap,
+	compactedMap map[string]interface{},
+	path string,
+) map[string][]*Diff {
+	original := compactMap(originalMap)
+	compacted := compactMap(compactedMap)
+
+	if reflect.DeepEqual(original, compacted) {
+		return nil
+	}
+
+	diffs := make(map[string][]*Diff)
+
+	if len(original) != len(compacted) {
+		for k, v := range original {
+			diffKey := path + "." + k
+			if _, ok := compacted[k]; !ok {
+				diffs[diffKey] = append(diffs[diffKey], &Diff{OriginalValue: v, CompactedValue: "!missing!"})
+			}
+		}
+
+		for k, v := range compacted {
+			diffKey := path + "." + k
+
+			if _, ok := original[k]; !ok {
+				diffs[diffKey] = append(diffs[diffKey], &Diff{OriginalValue: "!missing!", CompactedValue: v})
+			}
+		}
+
+		return diffs
+	}
+
+	for k, v1 := range original {
+		diffKey := path + "." + k
+
+		v1Map, isMap := v1.(map[string]interface{})
+		if !isMap {
+			continue
+		}
+
+		v2, present := compacted[k]
+		if !present { // special case - the name of the map was mapped, cannot guess what's a new name
+			diffs[diffKey] = append(diffs[diffKey], &Diff{OriginalValue: v1, CompactedValue: "!missing!"})
+			continue
+		}
+
+		v2Map, isMap := v2.(map[string]interface{})
+		if !isMap {
+			diffs[diffKey] = append(diffs[diffKey], &Diff{OriginalValue: v1, CompactedValue: v2})
+		}
+
+		mp := mapsHaveSameStructure(v1Map, v2Map, diffKey)
+		for m1, m2 := range mp {
+			diffs[m1] = append(diffs[m1], m2...)
+		}
+	}
+
+	return diffs
+}
+
+func findMapDiff(originalMap, compactedMap map[string]interface{}) map[string][]*Diff {
 	originalMap = compactMap(originalMap)
 	compactedMap = compactMap(compactedMap)
 
-	return cmp.Diff(originalMap, compactedMap, cmpopts.IgnoreUnexported())
+	return mapsHaveSameStructure(originalMap, compactedMap, "$")
+	//fmt.Println(diff)
+	//return cmp.Diff(originalMap, compactedMap, cmpopts.IgnoreUnexported())
 }
 
 func compactMap(m map[string]interface{}) map[string]interface{} {
