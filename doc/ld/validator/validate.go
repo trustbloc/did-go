@@ -154,7 +154,7 @@ func validateContextURIPosition(contextURIPositions []string, docMap map[string]
 	return nil
 }
 
-// nolint: gocyclo
+// nolint:gocyclo,funlen
 func mapsHaveSameStructure(
 	originalMap,
 	compactedMap map[string]interface{},
