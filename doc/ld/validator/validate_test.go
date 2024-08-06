@@ -173,7 +173,7 @@ func Test_ValidateJSONLDWithExtraUndefinedFields(t *testing.T) {
 
 	err := ValidateJSONLD(vc, WithDocumentLoader(loader))
 	require.Error(t, err)
-	require.ErrorContains(t, err, "JSON-LD doc has different structure after compaction")
+	require.EqualError(t, err, "JSON-LD doc has different structure after compaction")
 }
 
 func Test_ValidateJSONLDWithExtraUndefinedSubjectFields(t *testing.T) {
@@ -215,7 +215,41 @@ func Test_ValidateJSONLDWithExtraUndefinedSubjectFields(t *testing.T) {
 
 			err := ValidateJSONLD(vcJSON, WithDocumentLoader(loader))
 			require.Error(t, err)
-			require.ErrorContains(t, err, "JSON-LD doc has different structure after compaction")
+			require.EqualError(t, err, "JSON-LD doc has different structure after compaction")
+		})
+
+	t.Run("Extended basic VC model, credentialSubject is defined as object - undefined fields present and details",
+		func(t *testing.T) {
+			// Use a different VC to verify the case when credentialSubject is an array.
+			vcJSONTemplate := `
+{
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "%s"
+  ],
+  "id": "http://example.com/credentials/4643",
+  "type": [
+    "VerifiableCredential",
+    "CustomExt12"
+  ],
+  "issuer": "https://example.com/issuers/14",
+  "issuanceDate": "2018-02-24T05:28:04Z",
+  "referenceNumber": 83294847,
+  "credentialSubject": [
+    {
+      "id": "did:example:abcdef1234567",
+      "name": "Jane Doe",
+      "favoriteFood": "Papaya"
+    }
+  ]
+}
+`
+
+			vcJSON := fmt.Sprintf(vcJSONTemplate, contextURL)
+
+			err := ValidateJSONLD(vcJSON, WithDocumentLoader(loader), WithJSONLDIncludeDetailedStructureDiffOnError())
+			require.Error(t, err)
+			require.EqualError(t, err, "JSON-LD doc has different structure after compaction. Details: {\"$.credentialSubject\":[{\"OriginalValue\":{\"favoriteFood\":\"Papaya\",\"id\":\"did:example:abcdef1234567\",\"name\":\"Jane Doe\"},\"CompactedValue\":\"did:example:abcdef1234567\"}],\"$.credentialSubject.favoriteFood\":[{\"OriginalValue\":\"Papaya\",\"CompactedValue\":\"!missing!\"}],\"$.credentialSubject.id\":[{\"OriginalValue\":\"did:example:abcdef1234567\",\"CompactedValue\":\"!missing!\"}],\"$.credentialSubject.name\":[{\"OriginalValue\":\"Jane Doe\",\"CompactedValue\":\"!missing!\"}]}") //nolint:lll
 		})
 
 	t.Run("Extended basic VC model, credentialSubject is defined as array - undefined fields present", func(t *testing.T) {
@@ -248,7 +282,7 @@ func Test_ValidateJSONLDWithExtraUndefinedSubjectFields(t *testing.T) {
 
 		err := ValidateJSONLD(vcJSON, WithDocumentLoader(loader))
 		require.Error(t, err)
-		require.ErrorContains(t, err, "JSON-LD doc has different structure after compaction")
+		require.EqualError(t, err, "JSON-LD doc has different structure after compaction")
 	})
 }
 
@@ -311,7 +345,7 @@ func Test_ValidateJSONLD_WithExtraUndefinedFieldsInProof(t *testing.T) {
 	err = ValidateJSONLD(vcJSONWithInvalidProof, WithDocumentLoader(createTestDocumentLoader(t)))
 
 	require.Error(t, err)
-	require.ErrorContains(t, err, "JSON-LD doc has different structure after compaction")
+	require.EqualError(t, err, "JSON-LD doc has different structure after compaction")
 }
 
 func Test_ValidateJSONLD_CornerErrorCases(t *testing.T) {

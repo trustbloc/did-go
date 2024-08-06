@@ -19,10 +19,11 @@ import (
 )
 
 type validateOpts struct {
-	strict               bool
-	jsonldDocumentLoader ld.DocumentLoader
-	externalContext      []string
-	contextURIPositions  []string
+	strict                                    bool
+	jsonldDocumentLoader                      ld.DocumentLoader
+	externalContext                           []string
+	contextURIPositions                       []string
+	jsonldIncludeDetailedStructureDiffOnError bool
 }
 
 // ValidateOpts sets jsonld validation options.
@@ -32,6 +33,12 @@ type ValidateOpts func(opts *validateOpts)
 func WithDocumentLoader(jsonldDocumentLoader ld.DocumentLoader) ValidateOpts {
 	return func(opts *validateOpts) {
 		opts.jsonldDocumentLoader = jsonldDocumentLoader
+	}
+}
+
+func WithJSONLDIncludeDetailedStructureDiffOnError() ValidateOpts {
+	return func(opts *validateOpts) {
+		opts.jsonldIncludeDetailedStructureDiffOnError = true
 	}
 }
 
@@ -95,8 +102,15 @@ func ValidateJSONLDMap(docMap map[string]interface{}, options ...ValidateOpts) e
 
 	mapDiff := findMapDiff(docMap, docCompactedMap)
 	if opts.strict && len(mapDiff) != 0 {
-		diff, _ := json2.Marshal(mapDiff)
-		return fmt.Errorf("JSON-LD doc has different structure after compaction. Details: %v", string(diff))
+		errText := "JSON-LD doc has different structure after compaction"
+
+		if opts.jsonldIncludeDetailedStructureDiffOnError {
+			diff, _ := json2.Marshal(mapDiff)
+
+			errText = fmt.Sprintf("%s. Details: %v", errText, string(diff))
+		}
+
+		return errors.New(errText)
 	}
 
 	err = validateContextURIPosition(opts.contextURIPositions, docMap)
@@ -210,8 +224,6 @@ func findMapDiff(originalMap, compactedMap map[string]interface{}) map[string][]
 	compactedMap = compactMap(compactedMap)
 
 	return mapsHaveSameStructure(originalMap, compactedMap, "$")
-	//fmt.Println(diff)
-	//return cmp.Diff(originalMap, compactedMap, cmpopts.IgnoreUnexported())
 }
 
 func compactMap(m map[string]interface{}) map[string]interface{} {
