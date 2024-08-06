@@ -11,6 +11,8 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/piprate/json-gold/ld"
 
 	"github.com/trustbloc/did-go/doc/ld/processor"
@@ -92,8 +94,9 @@ func ValidateJSONLDMap(docMap map[string]interface{}, options ...ValidateOpts) e
 		return fmt.Errorf("compact JSON-LD document: %w", err)
 	}
 
-	if opts.strict && !mapsHaveSameStructure(docMap, docCompactedMap) {
-		return errors.New("JSON-LD doc has different structure after compaction")
+	mapDiff := findMapDiff(docMap, docCompactedMap)
+	if opts.strict && mapDiff != "" {
+		return fmt.Errorf("JSON-LD doc has different structure after compaction. Details: %v", mapDiff)
 	}
 
 	err = validateContextURIPosition(opts.contextURIPositions, docMap)
@@ -136,40 +139,11 @@ func validateContextURIPosition(contextURIPositions []string, docMap map[string]
 	return nil
 }
 
-func mapsHaveSameStructure(originalMap, compactedMap map[string]interface{}) bool {
-	original := compactMap(originalMap)
-	compacted := compactMap(compactedMap)
+func findMapDiff(originalMap, compactedMap map[string]interface{}) string {
+	originalMap = compactMap(originalMap)
+	compactedMap = compactMap(compactedMap)
 
-	if reflect.DeepEqual(original, compacted) {
-		return true
-	}
-
-	if len(original) != len(compacted) {
-		return false
-	}
-
-	for k, v1 := range original {
-		v1Map, isMap := v1.(map[string]interface{})
-		if !isMap {
-			continue
-		}
-
-		v2, present := compacted[k]
-		if !present { // special case - the name of the map was mapped, cannot guess what's a new name
-			continue
-		}
-
-		v2Map, isMap := v2.(map[string]interface{})
-		if !isMap {
-			return false
-		}
-
-		if !mapsHaveSameStructure(v1Map, v2Map) {
-			return false
-		}
-	}
-
-	return true
+	return cmp.Diff(originalMap, compactedMap, cmpopts.IgnoreUnexported())
 }
 
 func compactMap(m map[string]interface{}) map[string]interface{} {

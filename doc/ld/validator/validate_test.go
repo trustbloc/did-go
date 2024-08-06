@@ -173,7 +173,7 @@ func Test_ValidateJSONLDWithExtraUndefinedFields(t *testing.T) {
 
 	err := ValidateJSONLD(vc, WithDocumentLoader(loader))
 	require.Error(t, err)
-	require.EqualError(t, err, "JSON-LD doc has different structure after compaction")
+	require.ErrorContains(t, err, "JSON-LD doc has different structure after compaction")
 }
 
 func Test_ValidateJSONLDWithExtraUndefinedSubjectFields(t *testing.T) {
@@ -215,7 +215,7 @@ func Test_ValidateJSONLDWithExtraUndefinedSubjectFields(t *testing.T) {
 
 			err := ValidateJSONLD(vcJSON, WithDocumentLoader(loader))
 			require.Error(t, err)
-			require.EqualError(t, err, "JSON-LD doc has different structure after compaction")
+			require.ErrorContains(t, err, "JSON-LD doc has different structure after compaction")
 		})
 
 	t.Run("Extended basic VC model, credentialSubject is defined as array - undefined fields present", func(t *testing.T) {
@@ -248,7 +248,7 @@ func Test_ValidateJSONLDWithExtraUndefinedSubjectFields(t *testing.T) {
 
 		err := ValidateJSONLD(vcJSON, WithDocumentLoader(loader))
 		require.Error(t, err)
-		require.EqualError(t, err, "JSON-LD doc has different structure after compaction")
+		require.ErrorContains(t, err, "JSON-LD doc has different structure after compaction")
 	})
 }
 
@@ -311,7 +311,7 @@ func Test_ValidateJSONLD_WithExtraUndefinedFieldsInProof(t *testing.T) {
 	err = ValidateJSONLD(vcJSONWithInvalidProof, WithDocumentLoader(createTestDocumentLoader(t)))
 
 	require.Error(t, err)
-	require.EqualError(t, err, "JSON-LD doc has different structure after compaction")
+	require.ErrorContains(t, err, "JSON-LD doc has different structure after compaction")
 }
 
 func Test_ValidateJSONLD_CornerErrorCases(t *testing.T) {
