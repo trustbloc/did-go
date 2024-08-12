@@ -198,8 +198,7 @@ func mapsHaveSameStructure(
 
 		v2, present := compacted[k]
 		if !present { // special case - the name of the map was mapped, cannot guess what's a new name
-			diffs[diffKey] = append(diffs[diffKey], &Diff{OriginalValue: v1, CompactedValue: "!missing!"})
-			continue
+			continue // should not be counted as diff
 		}
 
 		v2Map, isMap := v2.(map[string]interface{})

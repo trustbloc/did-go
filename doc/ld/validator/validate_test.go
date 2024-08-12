@@ -562,6 +562,43 @@ func Benchmark_ValidateJSONLD(b *testing.B) {
 	})
 }
 
+func TestDiffOnEduCred(t *testing.T) {
+	diff := findMapDiff(map[string]any{
+		"degree": map[string]any{
+			"type": "BachelorDegree",
+			"name": "Bachelor of Science and Arts",
+		},
+		"alumniOf": map[string]any{
+			"id": "some-id",
+			"name": []any{
+				map[string]any{
+					"value": "University",
+					"lang":  "en",
+				},
+			},
+		},
+		"type": []interface{}{
+			"VerifiableCredential",
+			"UniversityDegreeCredential",
+		},
+	}, map[string]any{
+		"degree": map[string]any{
+			"type": "BachelorDegree",
+			"name": "Bachelor of Science and Arts",
+		},
+		"schema:alumniOf": map[string]any{
+			"id":          "some-id",
+			"schema:name": []any{},
+		},
+		"type": []interface{}{
+			"VerifiableCredential",
+			"UniversityDegreeCredential",
+		},
+	})
+
+	require.Len(t, diff, 0)
+}
+
 func createTestDocumentLoader(t *testing.T, extraContexts ...ldcontext.Document) *ldloader.DocumentLoader {
 	t.Helper()
 
