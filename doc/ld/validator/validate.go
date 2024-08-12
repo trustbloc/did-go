@@ -6,6 +6,7 @@ SPDX-License-Identifier: Apache-2.0
 package validator
 
 import (
+	json2 "encoding/json"
 	"errors"
 	"fmt"
 	"reflect"
@@ -18,10 +19,11 @@ import (
 )
 
 type validateOpts struct {
-	strict               bool
-	jsonldDocumentLoader ld.DocumentLoader
-	externalContext      []string
-	contextURIPositions  []string
+	strict                                    bool
+	jsonldDocumentLoader                      ld.DocumentLoader
+	externalContext                           []string
+	contextURIPositions                       []string
+	jsonldIncludeDetailedStructureDiffOnError bool
 }
 
 // ValidateOpts sets jsonld validation options.
@@ -31,6 +33,13 @@ type ValidateOpts func(opts *validateOpts)
 func WithDocumentLoader(jsonldDocumentLoader ld.DocumentLoader) ValidateOpts {
 	return func(opts *validateOpts) {
 		opts.jsonldDocumentLoader = jsonldDocumentLoader
+	}
+}
+
+// WithJSONLDIncludeDetailedStructureDiffOnError option is for including detailed structure diff in error message.
+func WithJSONLDIncludeDetailedStructureDiffOnError() ValidateOpts {
+	return func(opts *validateOpts) {
+		opts.jsonldIncludeDetailedStructureDiffOnError = true
 	}
 }
 
@@ -92,8 +101,17 @@ func ValidateJSONLDMap(docMap map[string]interface{}, options ...ValidateOpts) e
 		return fmt.Errorf("compact JSON-LD document: %w", err)
 	}
 
-	if opts.strict && !mapsHaveSameStructure(docMap, docCompactedMap) {
-		return errors.New("JSON-LD doc has different structure after compaction")
+	mapDiff := findMapDiff(docMap, docCompactedMap)
+	if opts.strict && len(mapDiff) != 0 {
+		errText := "JSON-LD doc has different structure after compaction"
+
+		if opts.jsonldIncludeDetailedStructureDiffOnError {
+			diff, _ := json2.Marshal(mapDiff) // nolint:errcheck
+
+			errText = fmt.Sprintf("%s. Details: %v", errText, string(diff))
+		}
+
+		return errors.New(errText)
 	}
 
 	err = validateContextURIPosition(opts.contextURIPositions, docMap)
@@ -136,19 +154,43 @@ func validateContextURIPosition(contextURIPositions []string, docMap map[string]
 	return nil
 }
 
-func mapsHaveSameStructure(originalMap, compactedMap map[string]interface{}) bool {
+// nolint:gocyclo,funlen
+func mapsHaveSameStructure(
+	originalMap,
+	compactedMap map[string]interface{},
+	path string,
+) map[string][]*Diff {
 	original := compactMap(originalMap)
 	compacted := compactMap(compactedMap)
 
 	if reflect.DeepEqual(original, compacted) {
-		return true
+		return nil
 	}
 
+	diffs := make(map[string][]*Diff)
+
 	if len(original) != len(compacted) {
-		return false
+		for k, v := range original {
+			diffKey := path + "." + k
+			if _, ok := compacted[k]; !ok {
+				diffs[diffKey] = append(diffs[diffKey], &Diff{OriginalValue: v, CompactedValue: "!missing!"})
+			}
+		}
+
+		for k, v := range compacted {
+			diffKey := path + "." + k
+
+			if _, ok := original[k]; !ok {
+				diffs[diffKey] = append(diffs[diffKey], &Diff{OriginalValue: "!missing!", CompactedValue: v})
+			}
+		}
+
+		return diffs
 	}
 
 	for k, v1 := range original {
+		diffKey := path + "." + k
+
 		v1Map, isMap := v1.(map[string]interface{})
 		if !isMap {
 			continue
@@ -156,20 +198,32 @@ func mapsHaveSameStructure(originalMap, compactedMap map[string]interface{}) boo
 
 		v2, present := compacted[k]
 		if !present { // special case - the name of the map was mapped, cannot guess what's a new name
-			continue
+			continue // should not be counted as diff
 		}
 
 		v2Map, isMap := v2.(map[string]interface{})
 		if !isMap {
-			return false
+			diffs[diffKey] = append(diffs[diffKey], &Diff{OriginalValue: v1, CompactedValue: v2})
 		}
 
-		if !mapsHaveSameStructure(v1Map, v2Map) {
-			return false
+		if v2Map == nil {
+			v2Map = make(map[string]interface{})
+		}
+
+		mp := mapsHaveSameStructure(v1Map, v2Map, diffKey)
+		for m1, m2 := range mp {
+			diffs[m1] = append(diffs[m1], m2...)
 		}
 	}
 
-	return true
+	return diffs
+}
+
+func findMapDiff(originalMap, compactedMap map[string]interface{}) map[string][]*Diff {
+	originalMap = compactMap(originalMap)
+	compactedMap = compactMap(compactedMap)
+
+	return mapsHaveSameStructure(originalMap, compactedMap, "$")
 }
 
 func compactMap(m map[string]interface{}) map[string]interface{} {
