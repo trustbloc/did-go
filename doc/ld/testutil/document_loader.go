@@ -29,7 +29,9 @@ var (
 	//go:embed contexts/third_party/w3.org/odrl.jsonld
 	odrl []byte
 	//go:embed contexts/third_party/w3.org/credentials-examples_v1.jsonld
-	credentialExamples []byte
+	credentialExamplesV1 []byte
+	//go:embed contexts/third_party/w3.org/credentials-examples_v2.jsonld
+	credentialExamplesV2 []byte
 	//go:embed contexts/third_party/trustbloc.github.io/trustbloc-examples_v1.jsonld
 	vcExamples []byte
 	//go:embed contexts/third_party/trustbloc.github.io/trustbloc-authorization-credential_v1.jsonld
@@ -50,7 +52,11 @@ var testContexts = []ldcontext.Document{ //nolint:gochecknoglobals // embedded t
 	},
 	{
 		URL:     "https://www.w3.org/2018/credentials/examples/v1",
-		Content: credentialExamples,
+		Content: credentialExamplesV1,
+	},
+	{
+		URL:     "https://www.w3.org/ns/credentials/examples/v2",
+		Content: credentialExamplesV2,
 	},
 	{
 		URL:     "https://trustbloc.github.io/context/vc/examples-v1.jsonld",
