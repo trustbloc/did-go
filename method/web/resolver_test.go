@@ -36,7 +36,7 @@ const (
 
 	validDoc = `{
   		"@context": ["https://w3id.org/did/v1"],
-  		"id": "did:web:www.example.org"
+  		"id": "%s"
 	}`
 
 	invalidDoc = `{}`
@@ -104,7 +104,8 @@ func TestResolveDID(t *testing.T) {
 	})
 	t.Run("test resolve did success", func(t *testing.T) {
 		s := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			_, err := w.Write([]byte(validDoc))
+			data := fmt.Sprintf(validDoc, "did:web:"+urlapi.QueryEscape(r.Host))
+			_, err := w.Write([]byte(data))
 			require.NoError(t, err)
 		}))
 		defer s.Close()
@@ -112,13 +113,28 @@ func TestResolveDID(t *testing.T) {
 		v := New()
 		docResolution, err := v.Read(did, vdrapi.WithOption(HTTPClientOpt, s.Client()))
 		require.Nil(t, err)
-		expectedDoc, err := didapi.ParseDocument([]byte(validDoc))
+		data := fmt.Sprintf(validDoc, did)
+		expectedDoc, err := didapi.ParseDocument([]byte(data))
 		require.Nil(t, err)
 		require.Equal(t, expectedDoc, docResolution.DIDDocument)
 	})
+	t.Run("test resolve with wrong did id", func(t *testing.T) {
+		s := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			data := fmt.Sprintf(validDoc, "did:web:123")
+			_, err := w.Write([]byte(data))
+			require.NoError(t, err)
+		}))
+		defer s.Close()
+		did := fmt.Sprintf("did:web:%s", urlapi.QueryEscape(strings.TrimPrefix(s.URL, "https://")))
+		v := New()
+		doc, err := v.Read(did, vdrapi.WithOption(HTTPClientOpt, s.Client()))
+		require.Nil(t, doc)
+		require.ErrorContains(t, err, "did id did:web:123 not matching did")
+	})
 	t.Run("test resolve did with path success", func(t *testing.T) {
 		s := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			_, err := w.Write([]byte(validDoc))
+			data := fmt.Sprintf(validDoc, "did:web:"+urlapi.QueryEscape(r.Host)+":user:example")
+			_, err := w.Write([]byte(data))
 			require.NoError(t, err)
 		}))
 		defer s.Close()
@@ -126,7 +142,8 @@ func TestResolveDID(t *testing.T) {
 		v := New()
 		docResolution, err := v.Read(did, vdrapi.WithOption(HTTPClientOpt, s.Client()))
 		require.Nil(t, err)
-		expectedDoc, err := didapi.ParseDocument([]byte(validDoc))
+		data := fmt.Sprintf(validDoc, did)
+		expectedDoc, err := didapi.ParseDocument([]byte(data))
 		require.Nil(t, err)
 		require.Equal(t, expectedDoc, docResolution.DIDDocument)
 	})
@@ -153,8 +170,8 @@ func TestResolveDomain(t *testing.T) {
 			http.NotFound(w, r)
 			return
 		}
-
-		_, err := w.Write(aliceDoc)
+		data := fmt.Sprintf(string(aliceDoc), "did:web:"+urlapi.QueryEscape(r.Host))
+		_, err := w.Write([]byte(data))
 		require.NoError(t, err)
 	}))
 	defer s.Close()
@@ -165,7 +182,9 @@ func TestResolveDomain(t *testing.T) {
 		v := New()
 		docResolution, err := v.Read(did, vdrapi.WithOption(HTTPClientOpt, s.Client()))
 		require.Nil(t, err)
-		expectedDoc, err := didapi.ParseDocument(aliceDoc)
+		data := fmt.Sprintf(string(aliceDoc), did)
+
+		expectedDoc, err := didapi.ParseDocument([]byte(data))
 		require.Nil(t, err)
 		require.Equal(t, expectedDoc, docResolution.DIDDocument)
 	})
@@ -181,7 +200,8 @@ func TestResolveWebFixtures(t *testing.T) {
 			return
 		}
 
-		_, err := w.Write(aliceDoc)
+		data := fmt.Sprintf(string(aliceDoc), "did:web:"+urlapi.QueryEscape(r.Host)+":alice")
+		_, err := w.Write([]byte(data))
 		require.NoError(t, err)
 	}))
 	defer s.Close()
@@ -192,7 +212,9 @@ func TestResolveWebFixtures(t *testing.T) {
 		v := New()
 		docResolution, err := v.Read(did, vdrapi.WithOption(HTTPClientOpt, s.Client()))
 		require.Nil(t, err)
-		expectedDoc, err := didapi.ParseDocument(aliceDoc)
+		data := fmt.Sprintf(string(aliceDoc), did)
+
+		expectedDoc, err := didapi.ParseDocument([]byte(data))
 		require.Nil(t, err)
 		require.Equal(t, expectedDoc, docResolution.DIDDocument)
 	})

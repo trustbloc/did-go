@@ -1,6 +1,6 @@
 {
   "@context": "https://w3id.org/did/v0.11",
-  "id": "did:web:did.actor:alice",
+  "id": "%s",
   "publicKey": [
     {
       "id": "did:web:did.actor:alice#z6MkrmNwty5ajKtFqc1U48oL2MMLjWjartwc5sf2AihZwXDN",
