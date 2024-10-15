@@ -29,7 +29,7 @@ const (
 var errorLogger = log.New(os.Stderr, " [did-go/vdr/web] ", log.Ldate|log.Ltime|log.LUTC)
 
 // Read resolves a did:web did.
-func (v *VDR) Read(didID string, opts ...vdrapi.DIDMethodOption) (*did.DocResolution, error) {
+func (v *VDR) Read(didID string, opts ...vdrapi.DIDMethodOption) (*did.DocResolution, error) { //nolint: gocyclo
 	httpClient := &http.Client{}
 
 	didOpts := &vdrapi.DIDMethodOpts{Values: make(map[string]interface{})}
@@ -78,6 +78,10 @@ func (v *VDR) Read(didID string, opts ...vdrapi.DIDMethodOption) (*did.DocResolu
 	doc, err := did.ParseDocument(body)
 	if err != nil {
 		return nil, fmt.Errorf("error resolving did:web did --> error parsing did doc --> %w", err)
+	}
+
+	if doc.ID != didID {
+		return nil, fmt.Errorf("did id %s not matching did %s", doc.ID, didID)
 	}
 
 	return &did.DocResolution{DIDDocument: doc}, nil
