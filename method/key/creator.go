@@ -21,7 +21,9 @@ const (
 	schemaResV1                = "https://w3id.org/did-resolution/v1"
 	schemaDIDV1                = "https://w3id.org/did/v1"
 	ed25519VerificationKey2018 = "Ed25519VerificationKey2018"
+	ed25519VerificationKey2020 = "Ed25519VerificationKey2020"
 	x25519KeyAgreementKey2019  = "X25519KeyAgreementKey2019"
+	x25519KeyAgreementKey2020  = "X25519KeyAgreementKey2019"
 	bls12381G2Key2020          = "Bls12381G2Key2020"
 	jsonWebKey2020             = "JsonWebKey2020"
 )
@@ -48,7 +50,9 @@ func (v *VDR) Create(didDoc *did.Doc, opts ...vdrapi.DIDMethodOption) (*did.DocR
 		return nil, fmt.Errorf("verification method is empty")
 	}
 
-	switch didDoc.VerificationMethod[0].Type {
+	verificationMethodType := didDoc.VerificationMethod[0].Type
+
+	switch verificationMethodType {
 	case jsonWebKey2020:
 		didKey, keyID, err = fingerprint.CreateDIDKeyByJwk(didDoc.VerificationMethod[0].JSONWebKey())
 		if err != nil {
@@ -66,8 +70,10 @@ func (v *VDR) Create(didDoc *did.Doc, opts ...vdrapi.DIDMethodOption) (*did.DocR
 	publicKey = did.NewVerificationMethodFromBytes(keyID, didDoc.VerificationMethod[0].Type, didKey,
 		didDoc.VerificationMethod[0].Value)
 
-	if didDoc.VerificationMethod[0].Type == ed25519VerificationKey2018 {
-		keyAgr, err = keyAgreementFromEd25519(didKey, didDoc.VerificationMethod[0].Value)
+	if verificationMethodType == ed25519VerificationKey2018 ||
+		verificationMethodType == ed25519VerificationKey2020 {
+		keyAgr, err = keyAgreementFromEd25519(didKey, didDoc.VerificationMethod[0].Value,
+			verificationMethodType)
 		if err != nil {
 			return nil, err
 		}
@@ -91,7 +97,7 @@ func getKeyCode(verificationMethod *did.VerificationMethod) (uint64, error) {
 	var keyCode uint64
 
 	switch verificationMethod.Type {
-	case ed25519VerificationKey2018:
+	case ed25519VerificationKey2018, ed25519VerificationKey2020:
 		keyCode = fingerprint.ED25519PubKeyMultiCodec
 	case bls12381G2Key2020:
 		keyCode = fingerprint.BLS12381g2PubKeyMultiCodec
@@ -126,15 +132,26 @@ func createDoc(pubKey, keyAgreement *did.VerificationMethod, didKey string) *did
 	}
 }
 
-func keyAgreementFromEd25519(didKey string, ed25519PubKey []byte) (*did.VerificationMethod, error) {
+func keyAgreementFromEd25519(
+	didKey string,
+	ed25519PubKey []byte,
+	verificationMethodType string,
+) (*did.VerificationMethod, error) {
 	curve25519PubKey, err := cryptoutil.PublicEd25519toCurve25519(ed25519PubKey)
 	if err != nil {
 		return nil, err
 	}
 
+	agreement := x25519KeyAgreementKey2019
+
+	if verificationMethodType == ed25519VerificationKey2020 {
+		agreement = x25519KeyAgreementKey2020
+	}
+
 	fp := fingerprint.KeyFingerprint(fingerprint.X25519PubKeyMultiCodec, curve25519PubKey)
 	keyID := fmt.Sprintf("%s#%s", didKey, fp)
-	pubKey := did.NewVerificationMethodFromBytes(keyID, x25519KeyAgreementKey2019, didKey, curve25519PubKey)
+
+	pubKey := did.NewVerificationMethodFromBytes(keyID, agreement, didKey, curve25519PubKey)
 
 	return pubKey, nil
 }
