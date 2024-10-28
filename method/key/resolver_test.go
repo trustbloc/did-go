@@ -68,7 +68,7 @@ func TestReadEd25519(t *testing.T) {
 		require.NotNil(t, docResolution.DIDDocument)
 		require.True(t, docResolution.DIDDocument.KeyAgreement[0].Embedded)
 
-		assertEd25519Doc(t, docResolution.DIDDocument)
+		assertEd25519Doc(t, docResolution.DIDDocument, ed25519VerificationKey2018, x25519KeyAgreementKey2019)
 	})
 }
 
