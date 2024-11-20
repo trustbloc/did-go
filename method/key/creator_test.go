@@ -58,7 +58,22 @@ func TestBuild(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, docResolution.DIDDocument)
 
-		assertEd25519Doc(t, docResolution.DIDDocument)
+		assertEd25519Doc(t, docResolution.DIDDocument, pubKey.Type, x25519KeyAgreementKey2019)
+	})
+
+	t.Run("build with default key type", func(t *testing.T) {
+		v := New()
+
+		pubKey := did.VerificationMethod{
+			Type:  ed25519VerificationKey2020,
+			Value: base58.Decode(pubKeyBase58Ed25519),
+		}
+
+		docResolution, err := v.Create(&did.Doc{VerificationMethod: []did.VerificationMethod{pubKey}})
+		require.NoError(t, err)
+		require.NotNil(t, docResolution.DIDDocument)
+
+		assertEd25519Doc(t, docResolution.DIDDocument, pubKey.Type, x25519KeyAgreementKey2020)
 	})
 
 	t.Run("build with BLS12381G2 key type", func(t *testing.T) {
@@ -190,7 +205,12 @@ func TestBuild(t *testing.T) {
 	})
 }
 
-func assertEd25519Doc(t *testing.T, doc *did.Doc) {
+func assertEd25519Doc(
+	t *testing.T,
+	doc *did.Doc,
+	expectedVerificationKeyType string,
+	agreement string,
+) {
 	const (
 		didKey         = "did:key:z6MkpTHR8VNsBxYAAWHut2Geadd9jSwuBV8xRoAnwWsdvktH"
 		didKeyID       = "did:key:z6MkpTHR8VNsBxYAAWHut2Geadd9jSwuBV8xRoAnwWsdvktH#z6MkpTHR8VNsBxYAAWHut2Geadd9jSwuBV8xRoAnwWsdvktH" //nolint:lll
@@ -200,8 +220,8 @@ func assertEd25519Doc(t *testing.T, doc *did.Doc) {
 		keyAgreementBase58 = "JhNWeSVLMYccCk7iopQW4guaSJTojqpMEELgSLhKwRr"
 	)
 
-	assertDualBase58Doc(t, doc, didKey, didKeyID, ed25519VerificationKey2018, pubKeyBase58,
-		agreementKeyID, x25519KeyAgreementKey2019, keyAgreementBase58)
+	assertDualBase58Doc(t, doc, didKey, didKeyID, expectedVerificationKeyType, pubKeyBase58,
+		agreementKeyID, agreement, keyAgreementBase58)
 }
 
 func assertBBSDoc(t *testing.T, doc *did.Doc) {

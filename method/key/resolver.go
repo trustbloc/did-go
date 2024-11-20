@@ -50,7 +50,7 @@ func (v *VDR) Read(didKey string, _ ...vdrapi.DIDMethodOption) (*did.DocResoluti
 func createDIDDocFromPubKey(kid string, code uint64, pubKeyBytes []byte) (*did.Doc, error) {
 	switch code {
 	case fingerprint.ED25519PubKeyMultiCodec:
-		return createEd25519DIDDoc(kid, pubKeyBytes)
+		return createEd25519DIDDoc(kid, pubKeyBytes, ed25519VerificationKey2018)
 	case fingerprint.BLS12381g2PubKeyMultiCodec, fingerprint.BLS12381g1g2PubKeyMultiCodec:
 		return createBase58DIDDoc(kid, bls12381G2Key2020, pubKeyBytes)
 	case fingerprint.P256PubKeyMultiCodec, fingerprint.P384PubKeyMultiCodec, fingerprint.P521PubKeyMultiCodec:
@@ -115,20 +115,20 @@ func createJSONWebKey2020DIDDoc(kid string, code uint64, pubKeyBytes []byte) (*d
 	return didDoc, nil
 }
 
-func createEd25519DIDDoc(kid string, pubKeyBytes []byte) (*did.Doc, error) {
+func createEd25519DIDDoc(kid string, pubKeyBytes []byte, verificationKeyType string) (*did.Doc, error) {
 	didKey := fmt.Sprintf("did:key:%s", kid)
 
 	// did:key can't add non converted encryption key as keyAgreement (unless it's added as an option just like creator,
 	// it can be added and read here if needed. Below TODO is a reminder for this)
 	// TODO find a way to get the Encryption key as in creator.go
 	// for now keeping original ed25519 to X25519 key conversion as keyAgreement.
-	keyAgr, err := keyAgreementFromEd25519(didKey, pubKeyBytes)
+	keyAgr, err := keyAgreementFromEd25519(didKey, pubKeyBytes, verificationKeyType)
 	if err != nil {
 		return nil, fmt.Errorf("pub:key vdr Read: failed to fetch KeyAgreement: %w", err)
 	}
 
 	keyID := fmt.Sprintf("%s#%s", didKey, kid)
-	publicKey := did.NewVerificationMethodFromBytes(keyID, ed25519VerificationKey2018, didKey, pubKeyBytes)
+	publicKey := did.NewVerificationMethodFromBytes(keyID, verificationKeyType, didKey, pubKeyBytes)
 
 	didDoc := createDoc(publicKey, keyAgr, didKey)
 
