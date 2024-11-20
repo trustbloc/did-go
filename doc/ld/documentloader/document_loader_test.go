@@ -164,6 +164,33 @@ func TestLoadDocument(t *testing.T) {
 		require.NoError(t, err)
 	})
 
+	t.Run("Load embedded document", func(t *testing.T) {
+		store := mockldstore.NewMockContextStore()
+		loader, err := documentloader.NewDocumentLoader(createMockProvider(withContextStore(store)))
+		require.NotNil(t, loader)
+		require.NoError(t, err)
+
+		rd, err := loader.LoadDocument(sampleJSONLDContext)
+
+		require.NotNil(t, rd)
+		require.NoError(t, err)
+
+		require.EqualValues(t, sampleJSONLDContext, rd.DocumentURL)
+		require.NotNil(t, rd.Document)
+	})
+
+	t.Run("Load embedded document fail", func(t *testing.T) {
+		store := mockldstore.NewMockContextStore()
+		loader, err := documentloader.NewDocumentLoader(createMockProvider(withContextStore(store)))
+		require.NotNil(t, loader)
+		require.NoError(t, err)
+
+		rd, err := loader.LoadDocument(`{...}`)
+
+		require.ErrorContains(t, err, "parse document from reader")
+		require.Nil(t, rd)
+	})
+
 	t.Run("Fetch remote context document and import into store", func(t *testing.T) {
 		store := mockldstore.NewMockContextStore()
 		store.Store.ErrGet = storage.ErrDataNotFound
