@@ -23,7 +23,7 @@ const (
 	ed25519VerificationKey2018 = "Ed25519VerificationKey2018"
 	ed25519VerificationKey2020 = "Ed25519VerificationKey2020"
 	x25519KeyAgreementKey2019  = "X25519KeyAgreementKey2019"
-	x25519KeyAgreementKey2020  = "X25519KeyAgreementKey2019"
+	x25519KeyAgreementKey2020  = "X25519KeyAgreementKey2020"
 	bls12381G2Key2020          = "Bls12381G2Key2020"
 	jsonWebKey2020             = "JsonWebKey2020"
 )
@@ -31,6 +31,7 @@ const (
 // Create new DID document for didDoc.
 // Either didDoc must contain non-empty VerificationMethod[] or opts must contain KeyType value of kms.KeyType to create
 // a new key and a corresponding *VerificationMethod entry.
+// nolint:gocyclo
 func (v *VDR) Create(didDoc *did.Doc, opts ...vdrapi.DIDMethodOption) (*did.DocResolution, error) {
 	createDIDOpts := &vdrapi.DIDMethodOpts{Values: make(map[string]interface{})}
 	// Apply options
