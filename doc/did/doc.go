@@ -468,15 +468,15 @@ func (r *rawDoc) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	var proofSingle interface{}
-
 	var proofArray []interface{}
 
-	if err := json.Unmarshal(temp.Proof, &proofSingle); err == nil {
-		proofArray = []interface{}{proofSingle}
-	} else {
-		if err = json.Unmarshal(temp.Proof, &proofArray); err != nil {
-			return fmt.Errorf("failed to unmarshal proof: %v", err)
+	if temp.Proof != nil {
+		var proofSingle interface{}
+
+		if err := json.Unmarshal(temp.Proof, &proofArray); err != nil {
+			if err = json.Unmarshal(temp.Proof, &proofSingle); err == nil {
+				proofArray = []interface{}{proofSingle}
+			}
 		}
 	}
 

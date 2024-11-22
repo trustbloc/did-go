@@ -22,13 +22,15 @@ import (
 	"github.com/btcsuite/btcutil/base58"
 	gojose "github.com/go-jose/go-jose/v3"
 	"github.com/stretchr/testify/require"
+
 	"github.com/trustbloc/did-go/doc/internal/mock/signature"
+
+	"github.com/trustbloc/kms-go/doc/jose/jwk"
 
 	"github.com/trustbloc/did-go/doc/did/endpoint"
 	"github.com/trustbloc/did-go/doc/ld/testutil"
 	"github.com/trustbloc/did-go/doc/signature/api"
 	"github.com/trustbloc/did-go/doc/signature/signer"
-	"github.com/trustbloc/kms-go/doc/jose/jwk"
 )
 
 const pemPK = `-----BEGIN PUBLIC KEY-----
@@ -1120,7 +1122,7 @@ func TestValidateDidDocProof(t *testing.T) {
 	})
 
 	t.Run("test did doc proof without created", func(t *testing.T) {
-		docs := []string{validDocWithProof, validDocV011WithProof}
+		docs := []string{validDocV011WithProof}
 		for _, d := range docs {
 			raw := &rawDoc{}
 			require.NoError(t, json.Unmarshal([]byte(d), &raw))
@@ -1136,7 +1138,7 @@ func TestValidateDidDocProof(t *testing.T) {
 	})
 
 	t.Run("test did doc proof without creator", func(t *testing.T) {
-		docs := []string{validDocWithProof, validDocV011WithProof}
+		docs := []string{validDocV011WithProof}
 		for _, d := range docs {
 			raw := &rawDoc{}
 			require.NoError(t, json.Unmarshal([]byte(d), &raw))

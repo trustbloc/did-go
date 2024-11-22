@@ -18,7 +18,7 @@ all: clean generate checks unit-test
 checks: generate license lint
 
 .PHONY: lint
-lint:
+lint: generate
 	@scripts/check_lint.sh
 
 .PHONY: license
