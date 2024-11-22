@@ -36,6 +36,7 @@ jobs:
           echo $PATH
           go env
           echo ${{ github.workspace }}
+          make generate
           make checks
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -55,7 +56,7 @@ jobs:
 
       - name: Run unit test
         timeout-minutes: 15
-        run: make unit-test
+        run: make generate && make unit-test
 
       - name: Upload coverage to Codecov
         timeout-minutes: 10
