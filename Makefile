@@ -34,7 +34,7 @@ license:
 	@scripts/check_license.sh
 
 .PHONY: unit-test
-unit-test:
+unit-test: generate
 	@scripts/check_unit.sh
 
 .PHONY: clean
