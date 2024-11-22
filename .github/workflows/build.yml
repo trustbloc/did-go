@@ -26,11 +26,12 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup Go 1.22
         uses: actions/setup-go@v4
         with:
           go-version: '1.22'
+      - run: make generate
       - name: Run checks
         run: |
           echo $PATH
@@ -52,7 +53,7 @@ jobs:
           go-version: '1.22'
         id: go
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Run unit test
         timeout-minutes: 15
