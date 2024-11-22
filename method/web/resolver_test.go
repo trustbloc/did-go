@@ -7,7 +7,10 @@ SPDX-License-Identifier: Apache-2.0
 package web
 
 import (
+	"bytes"
+	_ "embed"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -15,6 +18,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 
 	didapi "github.com/trustbloc/did-go/doc/did"
@@ -41,6 +45,9 @@ const (
 
 	invalidDoc = `{}`
 )
+
+//go:embed testdata/uscis.json
+var uscisDid []byte
 
 func TestParseDID(t *testing.T) {
 	t.Run("test parse did success", func(t *testing.T) {
@@ -218,4 +225,31 @@ func TestResolveWebFixtures(t *testing.T) {
 		require.Nil(t, err)
 		require.Equal(t, expectedDoc, docResolution.DIDDocument)
 	})
+}
+
+func TestResolveUscisDid(t *testing.T) {
+	cl := &http.Client{}
+	trip := NewMockroundTripper(gomock.NewController(t))
+	cl.Transport = trip
+
+	trip.EXPECT().RoundTrip(gomock.Any()).
+		DoAndReturn(func(request *http.Request) (*http.Response, error) {
+			return &http.Response{
+				StatusCode: http.StatusOK,
+				Body:       io.NopCloser(bytes.NewReader(uscisDid)),
+			}, nil
+		})
+
+	v := New()
+
+	docResolution, err := v.Read("did:web:dhs-svip.github.io:ns:uscis:oidp",
+		vdrapi.WithOption(HTTPClientOpt, cl))
+
+	require.NoError(t, err)
+	require.NotNil(t, docResolution)
+
+	require.Len(t, docResolution.DIDDocument.Proof, 1)
+	require.Len(t, docResolution.DIDDocument.VerificationMethod, 2)
+	require.EqualValues(t, "did:web:dhs-svip.github.io:ns:uscis:oidp", docResolution.DIDDocument.ID)
+	require.NotEmpty(t, docResolution.DIDDocument.Proof[0].ProofValue)
 }
