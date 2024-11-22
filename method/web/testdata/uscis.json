@@ -1,0 +1,42 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+    "https://w3id.org/security/multikey/v1",
+    "https://w3id.org/security/data-integrity/v2"
+  ],
+  "id": "did:web:dhs-svip.github.io:ns:uscis:oidp",
+  "verificationMethod": [
+    {
+      "id": "did:web:dhs-svip.github.io:ns:uscis:oidp#zDnaekqKLkVN1HqzBxy1Ti8niyCRxWkKr6cxDvX6P4qXDBATd",
+      "type": "Multikey",
+      "controller": "did:web:dhs-svip.github.io:ns:uscis:oidp",
+      "publicKeyMultibase": "zDnaekqKLkVN1HqzBxy1Ti8niyCRxWkKr6cxDvX6P4qXDBATd"
+    },
+    {
+      "id": "did:web:dhs-svip.github.io:ns:uscis:oidp#zUC7JawkqoPt9G87naub7Qbes4F9JWXJDgmbGHhZsfDYmoHVmDqZCE6rTTWiXGhFMjUEfJi1xxmDM1mga35Bue5zCp9aZp8bNFiztkFbHUtULb2PmWWvhfadVu3YfxuWR2s3z3e",
+      "type": "Multikey",
+      "controller": "did:web:dhs-svip.github.io:ns:uscis:oidp",
+      "publicKeyMultibase": "zUC7JawkqoPt9G87naub7Qbes4F9JWXJDgmbGHhZsfDYmoHVmDqZCE6rTTWiXGhFMjUEfJi1xxmDM1mga35Bue5zCp9aZp8bNFiztkFbHUtULb2PmWWvhfadVu3YfxuWR2s3z3e"
+    }
+  ],
+  "authentication": [
+    "did:web:dhs-svip.github.io:ns:uscis:oidp#zDnaekqKLkVN1HqzBxy1Ti8niyCRxWkKr6cxDvX6P4qXDBATd"
+  ],
+  "assertionMethod": [
+    "did:web:dhs-svip.github.io:ns:uscis:oidp#zDnaekqKLkVN1HqzBxy1Ti8niyCRxWkKr6cxDvX6P4qXDBATd",
+    "did:web:dhs-svip.github.io:ns:uscis:oidp#zUC7JawkqoPt9G87naub7Qbes4F9JWXJDgmbGHhZsfDYmoHVmDqZCE6rTTWiXGhFMjUEfJi1xxmDM1mga35Bue5zCp9aZp8bNFiztkFbHUtULb2PmWWvhfadVu3YfxuWR2s3z3e"
+  ],
+  "capabilityDelegation": [
+    "did:web:dhs-svip.github.io:ns:uscis:oidp#zDnaekqKLkVN1HqzBxy1Ti8niyCRxWkKr6cxDvX6P4qXDBATd"
+  ],
+  "capabilityInvocation": [
+    "did:web:dhs-svip.github.io:ns:uscis:oidp#zDnaekqKLkVN1HqzBxy1Ti8niyCRxWkKr6cxDvX6P4qXDBATd"
+  ],
+  "proof": {
+    "type": "DataIntegrityProof",
+    "verificationMethod": "did:key:zDnaemaR1s6YRSbkzwFPUF7AZgzLh2hscEkEy1QS5XojpmZmA#zDnaemaR1s6YRSbkzwFPUF7AZgzLh2hscEkEy1QS5XojpmZmA",
+    "cryptosuite": "ecdsa-rdfc-2019",
+    "proofPurpose": "assertionMethod",
+    "proofValue": "z52Hq5miF9FmksiRTfQJGz2pntJJWAZcu927MNCLPMUtMiDaq8AL8DkVwxXQ5f9dcGd9gipbmWt5dLVEcPgdsNXta"
+  }
+}

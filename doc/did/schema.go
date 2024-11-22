@@ -89,17 +89,24 @@ const (
     "updated": {
       "type": "string"
     },
-    "proof": {
-      "type": "array",
-      "items": {
+      "proof": {
+    "oneOf": [
+      {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/proof"
+        }
+      },
+      {
         "$ref": "#/definitions/proof"
       }
-    }
+    ]
+  }
   },
   "definitions": {
     "proof": {
       "type": "object",
-      "required": [ "type", "creator", "created", "proofValue"],
+      "required": [ "type", "proofValue"],
       "properties": {
         "type": {
           "type": "string",

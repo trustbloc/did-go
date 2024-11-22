@@ -453,6 +453,38 @@ type rawDoc struct {
 	Proof                []interface{}            `json:"proof,omitempty"`
 }
 
+// UnmarshalJSON handles the custom unmarshaling logic for the rawDoc struct.
+func (r *rawDoc) UnmarshalJSON(data []byte) error {
+	type Alias rawDoc
+
+	temp := &struct {
+		Proof json.RawMessage `json:"proof,omitempty"`
+		*Alias
+	}{
+		Alias: (*Alias)(r),
+	}
+
+	if err := json.Unmarshal(data, temp); err != nil {
+		return err
+	}
+
+	var proofArray []interface{}
+
+	if temp.Proof != nil {
+		var proofSingle interface{}
+
+		if err := json.Unmarshal(temp.Proof, &proofArray); err != nil {
+			if err = json.Unmarshal(temp.Proof, &proofSingle); err == nil {
+				proofArray = []interface{}{proofSingle}
+			}
+		}
+	}
+
+	r.Proof = proofArray
+
+	return nil
+}
+
 // Proof is cryptographic proof of the integrity of the DID Document.
 type Proof struct {
 	Type         string
@@ -601,13 +633,6 @@ func populateProofs(context, didID, baseURI string, rawProofs []interface{}) ([]
 			return nil, errors.New("rawProofs is not map[string]interface{}")
 		}
 
-		created := stringEntry(emap[jsonldCreated])
-
-		timeValue, err := time.Parse(time.RFC3339, created)
-		if err != nil {
-			return nil, err
-		}
-
 		proofKey := jsonldProofValue
 
 		if context == contextV011 {
@@ -635,13 +660,23 @@ func populateProofs(context, didID, baseURI string, rawProofs []interface{}) ([]
 
 		proof := Proof{
 			Type:         stringEntry(emap[jsonldType]),
-			Created:      &timeValue,
 			Creator:      creator,
 			ProofValue:   proofValue,
 			ProofPurpose: stringEntry(emap[jsonldProofPurpose]),
 			Domain:       stringEntry(emap[jsonldDomain]),
 			Nonce:        nonce,
 			relativeURL:  isRelative,
+		}
+
+		created := stringEntry(emap[jsonldCreated])
+		if created != "" {
+			timeValue, errTime := time.Parse(time.RFC3339, created)
+
+			if errTime != nil {
+				return nil, errTime
+			}
+
+			proof.Created = &timeValue
 		}
 
 		proofs = append(proofs, proof)

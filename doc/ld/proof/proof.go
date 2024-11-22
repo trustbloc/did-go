@@ -9,6 +9,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/multiformats/go-multibase"
 
@@ -156,6 +157,13 @@ func DecodeProofValue(s, proofType string) ([]byte, error) {
 		}
 
 		return nil, errors.New("unsupported encoding")
+	}
+
+	if strings.HasPrefix(s, "z") { // maybe base58
+		_, value, err := multibase.Decode(s)
+		if err == nil {
+			return value, nil
+		}
 	}
 
 	return decodeBase64(s)
