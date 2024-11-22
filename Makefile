@@ -44,7 +44,5 @@ clean:
 
 .PHONY: generate
 generate:
-	@echo "installing mockgen"
 	@go install github.com/golang/mock/mockgen@$(MOCK_VERSION)
-	@echo "running gen"
 	@go generate ./...
