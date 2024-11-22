@@ -6,6 +6,7 @@
 # Tool commands (overridable)
 DOCKER_CMD ?= docker
 
+GOBIN_PATH=$(abspath .)/.build/bin
 OS := $(shell uname)
 ifeq  ($(OS),$(filter $(OS),Darwin Linux))
 	PATH:=$(PATH):$(GOBIN_PATH)
