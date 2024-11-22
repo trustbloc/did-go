@@ -453,9 +453,10 @@ type rawDoc struct {
 	Proof                []interface{}            `json:"proof,omitempty"`
 }
 
-// UnmarshalJSON handles the custom unmarshaling logic for the rawDoc struct
+// UnmarshalJSON handles the custom unmarshaling logic for the rawDoc struct.
 func (r *rawDoc) UnmarshalJSON(data []byte) error {
 	type Alias rawDoc
+
 	temp := &struct {
 		Proof json.RawMessage `json:"proof,omitempty"`
 		*Alias
@@ -468,6 +469,7 @@ func (r *rawDoc) UnmarshalJSON(data []byte) error {
 	}
 
 	var proofSingle interface{}
+
 	var proofArray []interface{}
 
 	if err := json.Unmarshal(temp.Proof, &proofSingle); err == nil {
@@ -668,11 +670,13 @@ func populateProofs(context, didID, baseURI string, rawProofs []interface{}) ([]
 
 		created := stringEntry(emap[jsonldCreated])
 		if created != "" {
-			if timeValue, errTime := time.Parse(time.RFC3339, created); errTime != nil {
+			timeValue, errTime := time.Parse(time.RFC3339, created)
+
+			if errTime != nil {
 				return nil, errTime
-			} else {
-				proof.Created = &timeValue
 			}
+
+			proof.Created = &timeValue
 		}
 
 		proofs = append(proofs, proof)
