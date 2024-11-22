@@ -6,6 +6,13 @@
 # Tool commands (overridable)
 DOCKER_CMD ?= docker
 
+OS := $(shell uname)
+ifeq  ($(OS),$(filter $(OS),Darwin Linux))
+	PATH:=$(PATH):$(GOBIN_PATH)
+else
+	PATH:=$(PATH);$(subst /,\\,$(GOBIN_PATH))
+endif
+
 GOBIN_PATH=$(abspath .)/build/bin
 MOCKGEN=$(GOBIN_PATH)/mockgen
 GOMOCKS=pkg/internal/gomocks
