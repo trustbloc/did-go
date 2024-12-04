@@ -16,7 +16,7 @@ require (
 	github.com/multiformats/go-multibase v0.1.1
 	github.com/piprate/json-gold v0.5.1-0.20230111113000-6ddbe6e6f19f
 	github.com/stretchr/testify v1.8.3
-	github.com/trustbloc/kms-go v1.1.2
+	github.com/trustbloc/kms-go v1.2.0
 	github.com/xeipuuv/gojsonschema v1.2.0
 )
 
