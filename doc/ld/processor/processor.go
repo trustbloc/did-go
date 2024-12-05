@@ -37,11 +37,12 @@ var ErrInvalidRDFFound = errors.New("invalid JSON-LD context")
 
 // processorOpts holds options for canonicalization of JSON LD docs.
 type processorOpts struct {
-	removeInvalidRDF bool
-	frameBlankNodes  bool
-	validateRDF      bool
-	documentLoader   ld.DocumentLoader
-	externalContexts []string
+	removeInvalidRDF       bool
+	frameBlankNodes        bool
+	validateRDF            bool
+	documentLoader         ld.DocumentLoader
+	externalContexts       []string
+	messageDigestAlgorithm ld.MessageDigestAlgorithm
 }
 
 // Opts are the options for JSON LD operations on docs (like canonicalization or compacting).
@@ -84,6 +85,14 @@ func WithValidateRDF() Opts {
 	}
 }
 
+// WithMessageDigestAlgorithm option is for defining another
+// message digest algorithm than default ld.MessageDigestAlgorithmSHA256.
+func WithMessageDigestAlgorithm(mda ld.MessageDigestAlgorithm) Opts {
+	return func(opts *processorOpts) {
+		opts.messageDigestAlgorithm = mda
+	}
+}
+
 // Processor is JSON-LD processor for aries.
 // processing mode JSON-LD 1.0 {RFC: https://www.w3.org/TR/2014/REC-json-ld-20140116}
 type Processor struct {
@@ -117,6 +126,10 @@ func (p *Processor) GetCanonicalDocument(doc map[string]interface{}, opts ...Opt
 
 	if len(procOptions.externalContexts) > 0 {
 		doc["@context"] = AppendExternalContexts(doc["@context"], procOptions.externalContexts...)
+	}
+
+	if procOptions.messageDigestAlgorithm != "" {
+		ldOptions.MessageDigestAlgorithm = procOptions.messageDigestAlgorithm
 	}
 
 	proc := ld.NewJsonLdProcessor()
