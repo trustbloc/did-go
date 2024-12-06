@@ -12,6 +12,7 @@ import (
 	"log"
 	"testing"
 
+	"github.com/piprate/json-gold/ld"
 	"github.com/stretchr/testify/require"
 
 	ldcontext "github.com/trustbloc/did-go/doc/ld/context"
@@ -124,9 +125,15 @@ func TestGetCanonicalDocument(t *testing.T) {
 				opts:   []processor.Opts{processor.WithRemoveAllInvalidRDF()},
 			},
 			{
-				name:   "canonizing sample VC document with proper context 2",
+				name:   "canonizing sample VC document with proper context 2, default hash algo sha256",
 				doc:    vcWithProperContexts2,
 				result: canonizedJSONCredential2,
+			},
+			{
+				name:   "canonizing sample VC document with proper context 2, hash algo sha384",
+				doc:    vcWithProperContexts2,
+				opts:   []processor.Opts{processor.WithMessageDigestAlgorithm(ld.MessageDigestAlgorithmSHA384)},
+				result: canonizedJSONCredential2SHA384,
 			},
 			{
 				name:   "canonizing sample VC document with proper context 2 but remove all invalid RDF",
@@ -525,6 +532,8 @@ var (
 	canonizedJSONCredential string
 	//go:embed testdata/canonized_json_credential_2.nq
 	canonizedJSONCredential2 string
+	//go:embed testdata/canonized_json_credential_2_sha384.nq
+	canonizedJSONCredential2SHA384 string
 	//go:embed testdata/canonized_json_credential_filtered.nq
 	canonizedJSONCredentialFiltered string
 	//go:embed testdata/canonized_json_credential_not_filtered.nq
