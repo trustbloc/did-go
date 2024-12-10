@@ -89,14 +89,20 @@ func ValidateJSONLD(doc string, options ...ValidateOpts) error {
 }
 
 // ValidateJSONLDMap validates jsonld structure.
-func ValidateJSONLDMap(docMap map[string]interface{}, options ...ValidateOpts) error {
+func ValidateJSONLDMap(
+	docMap map[string]interface{},
+	options ...ValidateOpts,
+) error {
 	opts := getValidateOpts(options)
 
 	jsonldProc := processor.Default()
 
-	docCompactedMap, err := jsonldProc.Compact(docMap,
-		nil, processor.WithDocumentLoader(opts.jsonldDocumentLoader),
-		processor.WithExternalContext(opts.externalContext...))
+	docCompactedMap, err := jsonldProc.Compact(
+		docMap,
+		nil,
+		processor.WithDocumentLoader(opts.jsonldDocumentLoader),
+		processor.WithExternalContext(opts.externalContext...),
+	)
 	if err != nil {
 		return fmt.Errorf("compact JSON-LD document: %w", err)
 	}
@@ -117,6 +123,77 @@ func ValidateJSONLDMap(docMap map[string]interface{}, options ...ValidateOpts) e
 	err = validateContextURIPosition(opts.contextURIPositions, docMap)
 	if err != nil {
 		return fmt.Errorf("validate context URI position: %w", err)
+	}
+
+	return nil
+}
+
+func ValidateJSONLDTypes(
+	docMap map[string]interface{},
+	options ...ValidateOpts,
+) error {
+	typesObj, typeObjOk := docMap["type"]
+
+	if !typeObjOk {
+		return nil
+	}
+
+	types, typesOk := typesObj.([]interface{})
+	if !typesOk {
+		return errors.New("type must be an array")
+	}
+
+	if len(types) == 0 {
+		return nil
+	}
+
+	documentTypes := map[string]struct{}{}
+	for _, t := range types {
+		documentTypes[fmt.Sprint(t)] = struct{}{}
+	}
+
+	jsonldProc := processor.Default()
+	opts := getValidateOpts(options)
+
+	docExpanded, err := jsonldProc.Expand(
+		docMap,
+		nil,
+		processor.WithDocumentLoader(opts.jsonldDocumentLoader),
+		processor.WithExternalContext(opts.externalContext...),
+	)
+	if err != nil {
+		return errors.Join(err, errors.New("expand JSON-LD document"))
+	}
+
+	if len(docExpanded) != 1 {
+		return fmt.Errorf("expanded document must contain only one element, got %d", len(docExpanded))
+	}
+
+	docExpandedMap, ok := docExpanded[0].(map[string]interface{})
+	if !ok {
+		return fmt.Errorf("document must be a map, got %s", reflect.TypeOf(docExpanded[0]).String())
+	}
+
+	expandedTypesObj, expandedTypesObjOk := docExpandedMap["@type"]
+	if !expandedTypesObjOk {
+		return errors.New("expanded document does not contain @type")
+	}
+
+	expandedTypes, expandedTypesOk := expandedTypesObj.([]interface{})
+	if !expandedTypesOk {
+		return errors.New("expanded @type must be an array")
+	}
+
+	if len(expandedTypes) == 0 {
+		return nil
+	}
+
+	for _, t := range expandedTypes {
+		if _, typeOk := documentTypes[fmt.Sprint(t)]; typeOk {
+			// expand should change types to full URIs. example "VerifiableCredential" -> "https://www.w3.org/2018/credentials#VerifiableCredential"
+			return fmt.Errorf("expanded document contains unexpanded type %s. "+
+				"All types should be declared in contexts", t)
+		}
 	}
 
 	return nil

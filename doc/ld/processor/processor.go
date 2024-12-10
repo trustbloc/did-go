@@ -172,8 +172,32 @@ func AppendExternalContexts(context interface{}, extraContexts ...string) []inte
 }
 
 // Compact compacts given json ld object.
-func (p *Processor) Compact(input, context map[string]interface{},
-	opts ...Opts) (map[string]interface{}, error) {
+func (p *Processor) Compact(
+	input,
+	context map[string]interface{},
+	opts ...Opts,
+) (map[string]interface{}, error) {
+	options, context := p.getContextAndOptions(input, context, opts...)
+
+	return ld.NewJsonLdProcessor().Compact(input, context, options)
+}
+
+// Expand expands given json ld object.
+func (p *Processor) Expand(
+	input,
+	context map[string]interface{},
+	opts ...Opts,
+) ([]interface{}, error) {
+	options, context := p.getContextAndOptions(input, context, opts...)
+
+	return ld.NewJsonLdProcessor().Expand(input, options)
+}
+
+func (p *Processor) getContextAndOptions(
+	input map[string]any,
+	context map[string]any,
+	opts ...Opts,
+) (*ld.JsonLdOptions, map[string]any) {
 	procOptions := prepareOpts(opts)
 
 	ldOptions := ld.NewJsonLdOptions("")
@@ -193,7 +217,7 @@ func (p *Processor) Compact(input, context map[string]interface{},
 		context = map[string]interface{}{"@context": inputContext}
 	}
 
-	return ld.NewJsonLdProcessor().Compact(input, context, ldOptions)
+	return ldOptions, context
 }
 
 // Frame makes a frame from the inputDoc using frameDoc.
