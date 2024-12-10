@@ -128,6 +128,7 @@ func ValidateJSONLDMap(
 	return nil
 }
 
+// ValidateJSONLDTypes validates JSON-LD types.
 func ValidateJSONLDTypes(
 	docMap map[string]interface{},
 	options ...ValidateOpts,
