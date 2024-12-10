@@ -7,9 +7,13 @@ package validator
 
 import (
 	_ "embed"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"testing"
 
+	"github.com/piprate/json-gold/ld"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	ldcontext "github.com/trustbloc/did-go/doc/ld/context"
@@ -597,6 +601,79 @@ func TestDiffOnEduCred(t *testing.T) {
 	})
 
 	require.Len(t, diff, 0)
+}
+
+//go:embed testdata/credential_with_invalid_type.json
+var credentialWithInvalidType []byte
+
+//go:embed testdata/credential_with_valid_type.json
+var credentialWithValidType []byte
+
+func TestValidateType(t *testing.T) {
+	loader := ld.NewCachingDocumentLoader(ld.NewDefaultDocumentLoader(http.DefaultClient))
+
+	t.Run("invalid type", func(t *testing.T) {
+		var parsed map[string]interface{}
+		assert.NoError(t, json.Unmarshal(credentialWithInvalidType, &parsed))
+
+		err := ValidateJSONLDTypes(parsed, WithDocumentLoader(loader))
+		assert.ErrorContains(
+			t,
+			err,
+			"expanded document contains unexpanded type UnknownType. All types should be declared in contexts",
+		)
+	})
+
+	t.Run("no types", func(t *testing.T) {
+		var parsed map[string]interface{}
+		assert.NoError(t, json.Unmarshal([]byte(`{"a" : "b"}`), &parsed))
+
+		assert.NoError(t, ValidateJSONLDTypes(parsed, WithDocumentLoader(loader)))
+	})
+
+	t.Run("valid", func(t *testing.T) {
+		var parsed map[string]interface{}
+		assert.NoError(t, json.Unmarshal(credentialWithValidType, &parsed))
+
+		assert.NoError(t, ValidateJSONLDTypes(parsed, WithDocumentLoader(loader)))
+	})
+
+	t.Run("invalid length", func(t *testing.T) {
+		assert.ErrorContains(t, validateTypesInExpandedDoc([]any{
+			1,
+			2,
+		}, nil), "expanded document must contain only one element")
+	})
+
+	t.Run("invalid type", func(t *testing.T) {
+		assert.ErrorContains(t, validateTypesInExpandedDoc([]any{
+			1,
+		}, nil), "document must be a map")
+	})
+
+	t.Run("no type", func(t *testing.T) {
+		assert.ErrorContains(t, validateTypesInExpandedDoc([]any{
+			map[string]any{
+				"xx": "yy",
+			},
+		}, nil), "expanded document does not contain")
+	})
+
+	t.Run("no type", func(t *testing.T) {
+		assert.ErrorContains(t, validateTypesInExpandedDoc([]any{
+			map[string]any{
+				"@type": "yy",
+			},
+		}, nil), "expanded @type must be an array")
+	})
+
+	t.Run("no records", func(t *testing.T) {
+		assert.NoError(t, validateTypesInExpandedDoc([]any{
+			map[string]any{
+				"@type": []any{},
+			},
+		}, nil))
+	})
 }
 
 func createTestDocumentLoader(t *testing.T, extraContexts ...ldcontext.Document) *ldloader.DocumentLoader {
