@@ -637,6 +637,43 @@ func TestValidateType(t *testing.T) {
 
 		assert.NoError(t, ValidateJSONLDTypes(parsed, WithDocumentLoader(loader)))
 	})
+
+	t.Run("invalid length", func(t *testing.T) {
+		assert.ErrorContains(t, validateTypesInExpandedDoc([]any{
+			1,
+			2,
+		}, nil), "expanded document must contain only one element")
+	})
+
+	t.Run("invalid type", func(t *testing.T) {
+		assert.ErrorContains(t, validateTypesInExpandedDoc([]any{
+			1,
+		}, nil), "document must be a map")
+	})
+
+	t.Run("no type", func(t *testing.T) {
+		assert.ErrorContains(t, validateTypesInExpandedDoc([]any{
+			map[string]any{
+				"xx": "yy",
+			},
+		}, nil), "expanded document does not contain")
+	})
+
+	t.Run("no type", func(t *testing.T) {
+		assert.ErrorContains(t, validateTypesInExpandedDoc([]any{
+			map[string]any{
+				"@type": "yy",
+			},
+		}, nil), "expanded @type must be an array")
+	})
+
+	t.Run("no records", func(t *testing.T) {
+		assert.NoError(t, validateTypesInExpandedDoc([]any{
+			map[string]any{
+				"@type": []any{},
+			},
+		}, nil))
+	})
 }
 
 func createTestDocumentLoader(t *testing.T, extraContexts ...ldcontext.Document) *ldloader.DocumentLoader {

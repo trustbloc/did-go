@@ -165,6 +165,13 @@ func ValidateJSONLDTypes(
 		return errors.Join(err, errors.New("expand JSON-LD document"))
 	}
 
+	return validateTypesInExpandedDoc(docExpanded, documentTypes)
+}
+
+func validateTypesInExpandedDoc(
+	docExpanded []any,
+	types map[string]struct{},
+) error {
 	if len(docExpanded) != 1 {
 		return fmt.Errorf("expanded document must contain only one element, got %d", len(docExpanded))
 	}
@@ -189,7 +196,7 @@ func ValidateJSONLDTypes(
 	}
 
 	for _, t := range expandedTypes {
-		if _, typeOk := documentTypes[fmt.Sprint(t)]; typeOk {
+		if _, typeOk := types[fmt.Sprint(t)]; typeOk {
 			// expand should change types to full URIs.
 			// example "VerifiableCredential" -> "https://www.w3.org/2018/credentials#VerifiableCredential".
 			return fmt.Errorf("expanded document contains unexpanded type %s. "+
