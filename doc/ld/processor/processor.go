@@ -188,7 +188,7 @@ func (p *Processor) Expand(
 	context map[string]interface{},
 	opts ...Opts,
 ) ([]interface{}, error) {
-	options, context := p.getContextAndOptions(input, context, opts...)
+	options, _ := p.getContextAndOptions(input, context, opts...)
 
 	return ld.NewJsonLdProcessor().Expand(input, options)
 }
