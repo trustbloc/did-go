@@ -190,7 +190,8 @@ func ValidateJSONLDTypes(
 
 	for _, t := range expandedTypes {
 		if _, typeOk := documentTypes[fmt.Sprint(t)]; typeOk {
-			// expand should change types to full URIs. example "VerifiableCredential" -> "https://www.w3.org/2018/credentials#VerifiableCredential"
+			// expand should change types to full URIs.
+			// example "VerifiableCredential" -> "https://www.w3.org/2018/credentials#VerifiableCredential".
 			return fmt.Errorf("expanded document contains unexpanded type %s. "+
 				"All types should be declared in contexts", t)
 		}
