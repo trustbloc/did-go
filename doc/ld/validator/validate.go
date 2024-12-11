@@ -197,11 +197,13 @@ func validateTypesInExpandedDoc(
 	}
 
 	for _, t := range expandedTypes {
-		if _, typeOk := types[fmt.Sprint(t)]; typeOk {
+		typeStr := fmt.Sprint(t)
+
+		if !strings.HasPrefix(typeStr, "http://") && !strings.HasPrefix(typeStr, "https://") {
 			// expand should change types to full URIs.
 			// example "VerifiableCredential" -> "https://www.w3.org/2018/credentials#VerifiableCredential".
 			return fmt.Errorf("expanded document contains unexpanded type %s. "+
-				"All types should be declared in contexts", t)
+				"All types should be declared in contexts", typeStr)
 		}
 	}
 
