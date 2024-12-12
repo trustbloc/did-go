@@ -38,6 +38,8 @@ var (
 	authCred []byte
 	//go:embed contexts/third_party/w3id.org/data-integrity-v1.jsonld
 	dataIntegrity []byte
+	//go:embed contexts/third_party/w3id.org/data-integrity-v2.jsonld
+	dataIntegrityV2 []byte
 )
 
 var testContexts = []ldcontext.Document{ //nolint:gochecknoglobals // embedded test contexts
@@ -74,6 +76,10 @@ var testContexts = []ldcontext.Document{ //nolint:gochecknoglobals // embedded t
 	{
 		URL:     "https://w3id.org/security/data-integrity/v1",
 		Content: dataIntegrity,
+	},
+	{
+		URL:     "https://w3id.org/security/data-integrity/v2",
+		Content: dataIntegrityV2,
 	},
 }
 

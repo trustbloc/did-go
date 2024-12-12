@@ -141,16 +141,16 @@ func ValidateJSONLDTypes(
 
 	types, typesOk := typesObj.([]interface{})
 	if !typesOk {
-		return errors.New("type must be an array")
+		typeStr, typeStrOk := typesObj.(string)
+		if typeStrOk {
+			types = []interface{}{typeStr}
+		} else {
+			return errors.New("type must be an array or string")
+		}
 	}
 
 	if len(types) == 0 {
 		return nil
-	}
-
-	documentTypes := map[string]struct{}{}
-	for _, t := range types {
-		documentTypes[fmt.Sprint(t)] = struct{}{}
 	}
 
 	jsonldProc := processor.Default()
@@ -166,12 +166,11 @@ func ValidateJSONLDTypes(
 		return errors.Join(err, errors.New("expand JSON-LD document"))
 	}
 
-	return validateTypesInExpandedDoc(docExpanded, documentTypes)
+	return validateTypesInExpandedDoc(docExpanded)
 }
 
 func validateTypesInExpandedDoc(
 	docExpanded []any,
-	types map[string]struct{},
 ) error {
 	if len(docExpanded) != 1 {
 		return fmt.Errorf("expanded document must contain only one element, got %d", len(docExpanded))
@@ -197,11 +196,14 @@ func validateTypesInExpandedDoc(
 	}
 
 	for _, t := range expandedTypes {
-		if _, typeOk := types[fmt.Sprint(t)]; typeOk {
+		typeStr := fmt.Sprint(t)
+
+		if !strings.HasPrefix(typeStr, "http://") && !strings.HasPrefix(typeStr, "https://") &&
+			!strings.HasPrefix(typeStr, "urn:") {
 			// expand should change types to full URIs.
 			// example "VerifiableCredential" -> "https://www.w3.org/2018/credentials#VerifiableCredential".
 			return fmt.Errorf("expanded document contains unexpanded type %s. "+
-				"All types should be declared in contexts", t)
+				"All types should be declared in contexts", typeStr)
 		}
 	}
 

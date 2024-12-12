@@ -638,17 +638,40 @@ func TestValidateType(t *testing.T) {
 		assert.NoError(t, ValidateJSONLDTypes(parsed, WithDocumentLoader(loader)))
 	})
 
+	t.Run("valid 2", func(t *testing.T) {
+		var parsed map[string]interface{}
+		assert.NoError(t, json.Unmarshal([]byte(`{
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://www.w3.org/2018/credentials/examples/v1"
+  ],
+  "id": "http://example.edu/credentials/58473",
+  "type": ["VerifiableCredential", "AlumniCredential"],
+  "issuer": "https://example.edu/issuers/14",
+  "issuanceDate": "2010-01-01T19:23:24Z",
+  "credentialSubject": {
+    "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+    "alumniOf": "Example University"
+  },
+  "proof": {
+    "type": "RsaSignature2018"
+  }
+}`), &parsed))
+
+		assert.NoError(t, ValidateJSONLDTypes(parsed, WithDocumentLoader(loader)))
+	})
+
 	t.Run("invalid length", func(t *testing.T) {
 		assert.ErrorContains(t, validateTypesInExpandedDoc([]any{
 			1,
 			2,
-		}, nil), "expanded document must contain only one element")
+		}), "expanded document must contain only one element")
 	})
 
 	t.Run("invalid type", func(t *testing.T) {
 		assert.ErrorContains(t, validateTypesInExpandedDoc([]any{
 			1,
-		}, nil), "document must be a map")
+		}), "document must be a map")
 	})
 
 	t.Run("no type", func(t *testing.T) {
@@ -656,7 +679,7 @@ func TestValidateType(t *testing.T) {
 			map[string]any{
 				"xx": "yy",
 			},
-		}, nil), "expanded document does not contain")
+		}), "expanded document does not contain")
 	})
 
 	t.Run("no type", func(t *testing.T) {
@@ -664,7 +687,7 @@ func TestValidateType(t *testing.T) {
 			map[string]any{
 				"@type": "yy",
 			},
-		}, nil), "expanded @type must be an array")
+		}), "expanded @type must be an array")
 	})
 
 	t.Run("no records", func(t *testing.T) {
@@ -672,7 +695,7 @@ func TestValidateType(t *testing.T) {
 			map[string]any{
 				"@type": []any{},
 			},
-		}, nil))
+		}))
 	})
 }
 
