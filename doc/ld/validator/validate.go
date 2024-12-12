@@ -141,7 +141,12 @@ func ValidateJSONLDTypes(
 
 	types, typesOk := typesObj.([]interface{})
 	if !typesOk {
-		return errors.New("type must be an array")
+		typeStr, typeStrOk := typesObj.(string)
+		if typeStrOk {
+			types = []interface{}{typeStr}
+		} else {
+			return errors.New("type must be an array or string")
+		}
 	}
 
 	if len(types) == 0 {
