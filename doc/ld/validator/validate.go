@@ -153,11 +153,6 @@ func ValidateJSONLDTypes(
 		return nil
 	}
 
-	documentTypes := map[string]struct{}{}
-	for _, t := range types {
-		documentTypes[fmt.Sprint(t)] = struct{}{}
-	}
-
 	jsonldProc := processor.Default()
 	opts := getValidateOpts(options)
 
@@ -171,12 +166,11 @@ func ValidateJSONLDTypes(
 		return errors.Join(err, errors.New("expand JSON-LD document"))
 	}
 
-	return validateTypesInExpandedDoc(docExpanded, documentTypes)
+	return validateTypesInExpandedDoc(docExpanded)
 }
 
 func validateTypesInExpandedDoc(
 	docExpanded []any,
-	types map[string]struct{},
 ) error {
 	if len(docExpanded) != 1 {
 		return fmt.Errorf("expanded document must contain only one element, got %d", len(docExpanded))
