@@ -204,7 +204,8 @@ func validateTypesInExpandedDoc(
 	for _, t := range expandedTypes {
 		typeStr := fmt.Sprint(t)
 
-		if !strings.HasPrefix(typeStr, "http://") && !strings.HasPrefix(typeStr, "https://") {
+		if !strings.HasPrefix(typeStr, "http://") && !strings.HasPrefix(typeStr, "https://") &&
+			!strings.HasPrefix(typeStr, "urn:") {
 			// expand should change types to full URIs.
 			// example "VerifiableCredential" -> "https://www.w3.org/2018/credentials#VerifiableCredential".
 			return fmt.Errorf("expanded document contains unexpanded type %s. "+
