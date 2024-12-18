@@ -9,7 +9,6 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/multiformats/go-multibase"
 
@@ -41,6 +40,7 @@ const (
 	jsonldCapabilityChain = "capabilityChain"
 
 	ed25519Signature2020 = "Ed25519Signature2020"
+	dataIntegrityProof   = "DataIntegrityProof"
 )
 
 // Proof is cryptographic proof of the integrity of the DID Document.
@@ -150,23 +150,21 @@ func decodeBase64(s string) ([]byte, error) {
 
 // DecodeProofValue decodes proofValue basing on proof type.
 func DecodeProofValue(s, proofType string) ([]byte, error) {
-	if proofType == ed25519Signature2020 {
+	switch proofType {
+	case ed25519Signature2020:
 		_, value, err := multibase.Decode(s)
 		if err == nil {
 			return value, nil
 		}
 
 		return nil, errors.New("unsupported encoding")
+	case dataIntegrityProof:
+		// No need to decode Data integrity proof as encoding/decoding logic for this proof type
+		// is managed by vc-go/dataintegrity package.
+		return []byte(s), nil
+	default:
+		return decodeBase64(s)
 	}
-
-	if strings.HasPrefix(s, "z") { // maybe base58
-		_, value, err := multibase.Decode(s)
-		if err == nil {
-			return value, nil
-		}
-	}
-
-	return decodeBase64(s)
 }
 
 // stringEntry.
@@ -232,9 +230,14 @@ func (p *Proof) JSONLdObject() map[string]interface{} { // nolint:gocyclo
 
 // EncodeProofValue decodes proofValue basing on proof type.
 func EncodeProofValue(proofValue []byte, proofType string) string {
-	if proofType == ed25519Signature2020 {
+	switch proofType {
+	case ed25519Signature2020:
 		encoded, _ := multibase.Encode(multibase.Base58BTC, proofValue) //nolint: errcheck
 		return encoded
+	case dataIntegrityProof:
+		// No need to encode Data integrity proof as encoding/decoding logic for this proof type
+		// is managed by vc-go/dataintegrity package.
+		return string(proofValue)
 	}
 
 	return base64.RawURLEncoding.EncodeToString(proofValue)

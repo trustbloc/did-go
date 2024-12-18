@@ -106,7 +106,7 @@ const (
   "definitions": {
     "proof": {
       "type": "object",
-      "required": [ "type", "proofValue"],
+      "required": [ "type"],
       "properties": {
         "type": {
           "type": "string",
@@ -120,6 +120,9 @@ const (
           "type": "string"
         },
         "proofValue": {
+          "type": "string"
+        },
+        "jws": {
           "type": "string"
         },
         "domain": {
