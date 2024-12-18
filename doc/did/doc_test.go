@@ -16,6 +16,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"github.com/trustbloc/did-go/doc/signature/verifier"
 	"testing"
 	"time"
 
@@ -1388,12 +1389,12 @@ func TestVerifyProof(t *testing.T) {
 		require.NotNil(t, doc)
 		err = doc.VerifyProof(
 			[]api.VerifierSuite{&signature.MockVerifierSuite{MockSuite: signature.MockSuite{AcceptVal: true}}},
-			testutil.WithDocumentLoader(t),
+			verifier.WithProcessorOpts(testutil.WithDocumentLoader(t)),
 		)
 		require.NoError(t, err)
 
 		// error - no suites are passed, verifier is not created
-		err = doc.VerifyProof([]api.VerifierSuite{}, testutil.WithDocumentLoader(t))
+		err = doc.VerifyProof([]api.VerifierSuite{}, verifier.WithProcessorOpts(testutil.WithDocumentLoader(t)))
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "create verifier")
 
@@ -1404,7 +1405,7 @@ func TestVerifyProof(t *testing.T) {
 				MockSuite: signature.MockSuite{AcceptVal: true},
 				VerifyErr: errors.New("ed25519: invalid signature"),
 			}},
-			testutil.WithDocumentLoader(t),
+			verifier.WithProcessorOpts(testutil.WithDocumentLoader(t)),
 		)
 		require.NotNil(t, err)
 		require.Contains(t, err.Error(), "ed25519: invalid signature")
@@ -1415,7 +1416,7 @@ func TestVerifyProof(t *testing.T) {
 		require.NotNil(t, doc)
 		err = doc.VerifyProof(
 			[]api.VerifierSuite{&signature.MockVerifierSuite{MockSuite: signature.MockSuite{AcceptVal: true}}},
-			testutil.WithDocumentLoader(t),
+			verifier.WithProcessorOpts(testutil.WithDocumentLoader(t)),
 		)
 		require.Equal(t, ErrProofNotFound, err)
 		require.Contains(t, err.Error(), "proof not found")
