@@ -30,6 +30,7 @@ func TestProof(t *testing.T) {
 		"domain":             "abc.com",
 		"nonce":              "",
 		"proofValue":         proofValueBase64,
+		"cryptosuite":        "ecdsa-rdfc-2019",
 	})
 	require.NoError(t, err)
 
@@ -47,6 +48,7 @@ func TestProof(t *testing.T) {
 	require.Equal(t, "abc.com", p.Domain)
 	require.Equal(t, []byte(""), p.Nonce)
 	require.Equal(t, proofValueBytes, p.ProofValue)
+	//require.Equal(t, "ecdsa-rdfc-2019", p.CryptoSuite)
 
 	// test proof with multibase encoding
 	p, err = NewProof(map[string]interface{}{
@@ -57,6 +59,7 @@ func TestProof(t *testing.T) {
 		"domain":             "abc.com",
 		"nonce":              "",
 		"proofValue":         proofValueMultibase,
+		//"cryptosuite":        "eddsa-rdfc-2022",
 	})
 	require.NoError(t, err)
 
@@ -74,6 +77,7 @@ func TestProof(t *testing.T) {
 	require.Equal(t, "abc.com", p.Domain)
 	require.Equal(t, []byte(""), p.Nonce)
 	require.Equal(t, proofValueBytes, p.ProofValue)
+	//require.Equal(t, "eddsa-rdfc-2022", p.CryptoSuite)
 
 	// test created time with milliseconds section
 	p, err = NewProof(map[string]interface{}{
@@ -391,6 +395,7 @@ func TestProof_JSONLdObject(t *testing.T) {
 		Domain:       "internal",
 		Nonce:        nonceBase64,
 		Challenge:    "sample-challenge-xyz",
+		//CryptoSuite:  "eddsa-rdfc-2022",
 	}
 
 	pJSONLd := p.JSONLdObject()
@@ -403,6 +408,7 @@ func TestProof_JSONLdObject(t *testing.T) {
 	r.Equal("internal", pJSONLd["domain"])
 	r.Equal("abc", pJSONLd["nonce"])
 	r.Equal("sample-challenge-xyz", pJSONLd["challenge"])
+	r.Equal("eddsa-rdfc-2022", pJSONLd["cryptosuite"])
 
 	// test created time with milliseconds section
 	created, err = time.Parse(time.RFC3339Nano, "2018-03-15T00:00:00.972Z")

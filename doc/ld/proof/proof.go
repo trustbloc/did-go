@@ -39,6 +39,8 @@ const (
 	jsonldChallenge = "challenge"
 	// jsonldCapabilityChain is a key for capabilityChain.
 	jsonldCapabilityChain = "capabilityChain"
+	//jsonldCryptoSuite is a key for cryptosuite.
+	//jsonldCryptoSuite = "cryptosuite"
 
 	ed25519Signature2020 = "Ed25519Signature2020"
 )
@@ -113,7 +115,8 @@ func NewProof(emap map[string]interface{}) (*Proof, error) {
 		Domain:                  stringEntry(emap[jsonldDomain]),
 		Nonce:                   nonce,
 		Challenge:               stringEntry(emap[jsonldChallenge]),
-		CapabilityChain:         capabilityChain,
+		//CryptoSuite:             stringEntry(emap[jsonldCryptoSuite]),
+		CapabilityChain: capabilityChain,
 	}, nil
 }
 
@@ -226,6 +229,10 @@ func (p *Proof) JSONLdObject() map[string]interface{} { // nolint:gocyclo
 	if p.CapabilityChain != nil {
 		emap[jsonldCapabilityChain] = p.CapabilityChain
 	}
+
+	//if p.CryptoSuite != "" {
+	//	emap[jsonldCryptoSuite] = p.CryptoSuite
+	//}
 
 	return emap
 }
