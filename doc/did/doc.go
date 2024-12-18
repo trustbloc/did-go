@@ -25,7 +25,6 @@ import (
 	"github.com/xeipuuv/gojsonschema"
 
 	"github.com/trustbloc/did-go/doc/did/endpoint"
-	"github.com/trustbloc/did-go/doc/ld/processor"
 	sigproof "github.com/trustbloc/did-go/doc/ld/proof"
 	"github.com/trustbloc/did-go/doc/signature/api"
 	"github.com/trustbloc/did-go/doc/signature/verifier"
@@ -494,6 +493,7 @@ type Proof struct {
 	Domain       string
 	Nonce        []byte
 	ProofPurpose string
+	CryptoSuite  string
 	relativeURL  bool
 }
 
@@ -1246,7 +1246,7 @@ func (doc *Doc) MarshalJSON() ([]byte, error) {
 }
 
 // VerifyProof verifies document proofs.
-func (doc *Doc) VerifyProof(suites []api.VerifierSuite, jsonldOpts ...processor.Opts) error {
+func (doc *Doc) VerifyProof(suites []api.VerifierSuite, opts ...verifier.Opts) error {
 	if len(doc.Proof) == 0 {
 		return ErrProofNotFound
 	}
@@ -1261,7 +1261,7 @@ func (doc *Doc) VerifyProof(suites []api.VerifierSuite, jsonldOpts ...processor.
 		return fmt.Errorf("create verifier: %w", err)
 	}
 
-	return v.Verify(docBytes, jsonldOpts...)
+	return v.Verify(docBytes, opts...)
 }
 
 // VerificationMethods returns verification methods of DID Doc of certain relationship.

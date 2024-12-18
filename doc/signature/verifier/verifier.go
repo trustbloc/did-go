@@ -10,6 +10,9 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/trustbloc/vc-go/dataintegrity"
+	"github.com/trustbloc/vc-go/dataintegrity/models"
+
 	"github.com/trustbloc/did-go/doc/ld/processor"
 	"github.com/trustbloc/did-go/doc/ld/proof"
 	"github.com/trustbloc/did-go/doc/signature/api"
@@ -19,6 +22,47 @@ import (
 type keyResolver interface {
 	// Resolve will return public key bytes and the type of public key
 	Resolve(id string) (*api.PublicKey, error)
+}
+
+type verifyDataIntegrityOpts struct {
+	Verifier  *dataintegrity.Verifier
+	Purpose   string
+	Domain    string
+	Challenge string
+}
+
+type verifierOpts struct {
+	processorOpts           []processor.Opts
+	verifyDataIntegrityOpts *verifyDataIntegrityOpts
+}
+
+type Opts func(*verifierOpts)
+
+// WithProcessorOpts option for providing options for canonicalization of JSON LD docs.
+func WithProcessorOpts(processorOpts ...processor.Opts) Opts {
+	return func(opts *verifierOpts) {
+		opts.processorOpts = processorOpts
+	}
+}
+
+// WithDataIntegrityVerifier provides the Data Integrity verifier to use when
+// the document being processed has a Data Integrity proof.
+func WithDataIntegrityVerifier(v *dataintegrity.Verifier) Opts {
+	return func(opts *verifierOpts) {
+		opts.verifyDataIntegrityOpts.Verifier = v
+	}
+}
+
+// WithExpectedDataIntegrityFields validates that a Data Integrity proof has the
+// given purpose, domain, and challenge. Empty purpose means the default,
+// assertionMethod, will be expected. Empty domain and challenge will mean they
+// are not checked.
+func WithExpectedDataIntegrityFields(purpose, domain, challenge string) Opts {
+	return func(opts *verifierOpts) {
+		opts.verifyDataIntegrityOpts.Purpose = purpose
+		opts.verifyDataIntegrityOpts.Domain = domain
+		opts.verifyDataIntegrityOpts.Challenge = challenge
+	}
 }
 
 // DocumentVerifier implements JSON LD document proof verification.
@@ -40,7 +84,7 @@ func New(resolver keyResolver, suites ...api.VerifierSuite) (*DocumentVerifier, 
 }
 
 // Verify will verify document proofs.
-func (dv *DocumentVerifier) Verify(jsonLdDoc []byte, opts ...processor.Opts) error {
+func (dv *DocumentVerifier) Verify(jsonLdDoc []byte, opts ...Opts) error {
 	var jsonLdObject map[string]interface{}
 
 	err := json.Unmarshal(jsonLdDoc, &jsonLdObject)
@@ -52,42 +96,67 @@ func (dv *DocumentVerifier) Verify(jsonLdDoc []byte, opts ...processor.Opts) err
 }
 
 // VerifyObject will verify document proofs for JSON LD object.
-func (dv *DocumentVerifier) VerifyObject(jsonLdObject map[string]interface{}, opts ...processor.Opts) error {
+func (dv *DocumentVerifier) VerifyObject(jsonLdObject map[string]interface{}, opts ...Opts) error {
+	options := &verifierOpts{
+		verifyDataIntegrityOpts: &verifyDataIntegrityOpts{},
+	}
+
+	for _, opt := range opts {
+		opt(options)
+	}
+
 	proofs, err := proof.GetProofs(jsonLdObject)
 	if err != nil {
 		return err
 	}
 
 	for _, p := range proofs {
-		publicKeyID, err := p.PublicKeyID()
-		if err != nil {
-			return err
+		switch p.Type {
+		case models.DataIntegrityProof:
+			err = checkDataIntegrityProof(jsonLdObject, options.verifyDataIntegrityOpts)
+			if err != nil {
+				return err
+			}
+		default:
+			err = dv.checkLinkedDataProof(jsonLdObject, p, options.processorOpts...)
+			if err != nil {
+				return err
+			}
 		}
+	}
 
-		publicKey, err := dv.pkResolver.Resolve(publicKeyID)
-		if err != nil {
-			return err
-		}
+	return nil
+}
 
-		suite, err := dv.getSignatureSuite(p.Type)
-		if err != nil {
-			return err
-		}
+func (dv *DocumentVerifier) checkLinkedDataProof(jsonLdObject map[string]interface{}, p *proof.Proof, opts ...processor.Opts) error {
+	publicKeyID, err := p.PublicKeyID()
+	if err != nil {
+		return err
+	}
 
-		message, err := proof.CreateVerifyData(suite, jsonLdObject, p, opts...)
-		if err != nil {
-			return err
-		}
+	publicKey, err := dv.pkResolver.Resolve(publicKeyID)
+	if err != nil {
+		return err
+	}
 
-		signature, err := getProofVerifyValue(p)
-		if err != nil {
-			return err
-		}
+	suite, err := dv.getSignatureSuite(p.Type)
+	if err != nil {
+		return err
+	}
 
-		err = suite.Verify(publicKey, message, signature)
-		if err != nil {
-			return err
-		}
+	message, err := proof.CreateVerifyData(suite, jsonLdObject, p, opts...)
+	if err != nil {
+		return err
+	}
+
+	signature, err := getProofVerifyValue(p)
+	if err != nil {
+		return err
+	}
+
+	err = suite.Verify(publicKey, message, signature)
+	if err != nil {
+		return err
 	}
 
 	return nil

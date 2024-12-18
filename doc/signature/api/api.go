@@ -13,6 +13,7 @@ import (
 	"github.com/trustbloc/kms-go/doc/jose/jwk"
 
 	"github.com/trustbloc/did-go/doc/ld/processor"
+	"github.com/trustbloc/did-go/doc/signature/verifier"
 )
 
 // Context holds signing options and private key.
@@ -38,9 +39,9 @@ type Signer interface {
 // Verifier wraps a set of VerifierSuite instances and verifies proofs on json LD documents.
 type Verifier interface {
 	// Verify verifies a json LD proof on a document.
-	Verify(jsonLdDoc []byte, opts ...processor.Opts) error
+	Verify(jsonLdDoc []byte, opts ...verifier.Opts) error
 	// VerifyObject verifies a json LD proof on a document unmarshalled following json.Unmarshal conventions.
-	VerifyObject(jsonLdObject map[string]interface{}, opts ...processor.Opts) error
+	VerifyObject(jsonLdObject map[string]interface{}, opts ...verifier.Opts) error
 }
 
 // SignatureSuite provides common methods for signature suites.
