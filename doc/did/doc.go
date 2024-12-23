@@ -48,13 +48,17 @@ const (
 	jsonldController    = "controller"
 	jsonldOwner         = "owner"
 
-	jsonldCreator        = "creator"
-	jsonldCreated        = "created"
-	jsonldProofValue     = "proofValue"
-	jsonldSignatureValue = "signatureValue"
-	jsonldDomain         = "domain"
-	jsonldNonce          = "nonce"
-	jsonldProofPurpose   = "proofPurpose"
+	jsonldCreator            = "creator"
+	jsonldCreated            = "created"
+	jsonldProofValue         = "proofValue"
+	jsonldSignatureValue     = "signatureValue"
+	jsonldDomain             = "domain"
+	jsonldNonce              = "nonce"
+	jsonldProofPurpose       = "proofPurpose"
+	jsonldChallenge          = "challenge"
+	jsonldCryptoSuite        = "cryptosuite"
+	jsonldVerificationMethod = "verificationMethod"
+	jsonldJWS                = "jws"
 
 	// various public key encodings.
 	jsonldPublicKeyBase58    = "publicKeyBase58"
@@ -487,14 +491,18 @@ func (r *rawDoc) UnmarshalJSON(data []byte) error {
 
 // Proof is cryptographic proof of the integrity of the DID Document.
 type Proof struct {
-	Type         string
-	Created      *time.Time
-	Creator      string
-	ProofValue   []byte
-	Domain       string
-	Nonce        []byte
-	ProofPurpose string
-	relativeURL  bool
+	Type               string
+	Created            *time.Time
+	Creator            string
+	ProofValue         []byte
+	Domain             string
+	Nonce              []byte
+	ProofPurpose       string
+	CryptoSuite        string
+	Challenge          string
+	VerificationMethod string
+	JWS                string
+	relativeURL        bool
 }
 
 // UnmarshalJSON unmarshals a DID Document.
@@ -624,7 +632,7 @@ func populateVerificationRelationships(doc *Doc, raw *rawDoc) error {
 	return nil
 }
 
-func populateProofs(context, didID, baseURI string, rawProofs []interface{}) ([]Proof, error) {
+func populateProofs(context, didID, baseURI string, rawProofs []interface{}) ([]Proof, error) { // nolint:funlen
 	proofs := make([]Proof, 0, len(rawProofs))
 
 	for _, rawProof := range rawProofs {
@@ -659,13 +667,17 @@ func populateProofs(context, didID, baseURI string, rawProofs []interface{}) ([]
 		}
 
 		proof := Proof{
-			Type:         stringEntry(emap[jsonldType]),
-			Creator:      creator,
-			ProofValue:   proofValue,
-			ProofPurpose: stringEntry(emap[jsonldProofPurpose]),
-			Domain:       stringEntry(emap[jsonldDomain]),
-			Nonce:        nonce,
-			relativeURL:  isRelative,
+			Type:               stringEntry(emap[jsonldType]),
+			Creator:            creator,
+			ProofValue:         proofValue,
+			ProofPurpose:       stringEntry(emap[jsonldProofPurpose]),
+			Domain:             stringEntry(emap[jsonldDomain]),
+			VerificationMethod: stringEntry(emap[jsonldVerificationMethod]),
+			CryptoSuite:        stringEntry(emap[jsonldCryptoSuite]),
+			Challenge:          stringEntry(emap[jsonldChallenge]),
+			JWS:                stringEntry(emap[jsonldJWS]),
+			Nonce:              nonce,
+			relativeURL:        isRelative,
 		}
 
 		created := stringEntry(emap[jsonldCreated])
@@ -1246,7 +1258,8 @@ func (doc *Doc) MarshalJSON() ([]byte, error) {
 }
 
 // VerifyProof verifies document proofs.
-func (doc *Doc) VerifyProof(suites []api.VerifierSuite, jsonldOpts ...processor.Opts) error {
+// Deprecated. Please use vc-go/verifiable.VerifyDIDProof().
+func (doc *Doc) VerifyProof(suites []api.VerifierSuite, opts ...processor.Opts) error {
 	if len(doc.Proof) == 0 {
 		return ErrProofNotFound
 	}
@@ -1261,7 +1274,7 @@ func (doc *Doc) VerifyProof(suites []api.VerifierSuite, jsonldOpts ...processor.
 		return fmt.Errorf("create verifier: %w", err)
 	}
 
-	return v.Verify(docBytes, jsonldOpts...)
+	return v.Verify(docBytes, opts...)
 }
 
 // VerificationMethods returns verification methods of DID Doc of certain relationship.
@@ -1552,10 +1565,10 @@ func populateRawVerification(context, baseURI, didID string, verifications []Ver
 func populateRawProofs(context, didID, baseURI string, proofs []Proof) []interface{} {
 	rawProofs := make([]interface{}, 0, len(proofs))
 
-	k := jsonldProofValue
+	proofValueKey := jsonldProofValue
 
 	if context == contextV011 {
-		k = jsonldSignatureValue
+		proofValueKey = jsonldSignatureValue
 	}
 
 	for _, p := range proofs {
@@ -1564,15 +1577,36 @@ func populateRawProofs(context, didID, baseURI string, proofs []Proof) []interfa
 			creator = makeRelativeDIDURL(p.Creator, baseURI, didID)
 		}
 
-		rawProofs = append(rawProofs, map[string]interface{}{
+		rawProof := map[string]interface{}{
 			jsonldType:         p.Type,
 			jsonldCreated:      p.Created,
 			jsonldCreator:      creator,
-			k:                  sigproof.EncodeProofValue(p.ProofValue, p.Type),
 			jsonldDomain:       p.Domain,
 			jsonldNonce:        base64.RawURLEncoding.EncodeToString(p.Nonce),
 			jsonldProofPurpose: p.ProofPurpose,
-		})
+		}
+
+		if len(p.ProofValue) > 0 {
+			rawProof[proofValueKey] = sigproof.EncodeProofValue(p.ProofValue, p.Type)
+		}
+
+		if p.JWS != "" {
+			rawProof[jsonldJWS] = p.JWS
+		}
+
+		if p.CryptoSuite != "" {
+			rawProof[jsonldCryptoSuite] = p.CryptoSuite
+		}
+
+		if p.Challenge != "" {
+			rawProof[jsonldChallenge] = p.Challenge
+		}
+
+		if p.VerificationMethod != "" {
+			rawProof[jsonldVerificationMethod] = p.VerificationMethod
+		}
+
+		rawProofs = append(rawProofs, rawProof)
 	}
 
 	return rawProofs

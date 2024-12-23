@@ -476,12 +476,18 @@ func TestValidWithProof(t *testing.T) {
 		require.NoError(t, err)
 
 		eProof := Proof{
-			Type:       "Ed25519Signature2018",
-			Created:    &created,
-			Creator:    "did:method:abc#key-1",
-			ProofValue: proofValue,
-			Domain:     "",
-			Nonce:      nonce,
+			Type:               "Ed25519Signature2018",
+			Created:            &created,
+			Creator:            "did:method:abc#key-1",
+			ProofValue:         proofValue,
+			Domain:             "",
+			Nonce:              nonce,
+			ProofPurpose:       "assertionMethod",
+			CryptoSuite:        "cryptosuite1",
+			Challenge:          "challenge1",
+			VerificationMethod: "verificationMethod1",
+			JWS:                "jws1",
+			relativeURL:        false,
 		}
 		require.Equal(t, []Proof{eProof}, doc.Proof)
 
@@ -1153,19 +1159,6 @@ func TestValidateDidDocProof(t *testing.T) {
 		}
 	})
 
-	t.Run("test did doc proof without proofValue", func(t *testing.T) {
-		raw := &rawDoc{}
-		require.NoError(t, json.Unmarshal([]byte(validDocWithProof), &raw))
-		proof, ok := raw.Proof[0].(map[string]interface{})
-		require.True(t, ok)
-		delete(proof, jsonldProofValue)
-		bytes, err := json.Marshal(raw)
-		require.NoError(t, err)
-		err = validate(bytes, raw.schemaLoader())
-		require.Error(t, err)
-		require.Contains(t, err.Error(), "proofValue is required")
-	})
-
 	t.Run("test did doc proof without proofValue v0.11", func(t *testing.T) {
 		raw := &rawDoc{}
 		require.NoError(t, json.Unmarshal([]byte(validDocV011WithProof), &raw))
@@ -1234,7 +1227,8 @@ func TestRequiresLegacyHandling(t *testing.T) {
 
 func TestJSONConversion(t *testing.T) {
 	docs := []string{
-		validDoc, validDocV011, validDocWithProofAndJWK, docV011WithVerificationRelationships, validDocWithBase,
+		validDoc, validDocV011, validDocWithProofAndJWK,
+		docV011WithVerificationRelationships, validDocWithBase, validDocWithProof,
 	}
 	for _, d := range docs {
 		// setup -> create Document from json byte data
@@ -2019,7 +2013,12 @@ const validDocWithProof = `{
 		"domain": "",
 		"nonce": "",
 		"proofValue": "6mdES87erjP5r1qCSRW__otj-A_Rj0YgRO7XU_0Amhwdfa7AAmtGUSFGflR_fZqPYrY9ceLRVQCJ49s0q7-LBA",
-		"type": "Ed25519Signature2018"
+		"type": "Ed25519Signature2018",
+		"proofPurpose": "assertionMethod",
+		"challenge": "challenge1",
+		"cryptosuite": "cryptosuite1",
+		"verificationMethod": "verificationMethod1",
+		"jws": "jws1"
 	}],
 	"verificationMethod": [{
 		"controller": "did:method:abc",
@@ -2074,7 +2073,12 @@ const validDocV011WithProof = `{
 		"domain": "",
 		"nonce": "",
 		"signatureValue": "6mdES87erjP5r1qCSRW__otj-A_Rj0YgRO7XU_0Amhwdfa7AAmtGUSFGflR_fZqPYrY9ceLRVQCJ49s0q7-LBA",
-		"type": "Ed25519Signature2018"
+		"type": "Ed25519Signature2018",
+		"proofPurpose": "assertionMethod",
+		"challenge": "challenge1",
+		"cryptosuite": "cryptosuite1",
+		"verificationMethod": "verificationMethod1",
+		"jws": "jws1"
 	}],
 	"publicKey": [{
 		"owner": "did:method:abc",

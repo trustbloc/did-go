@@ -36,6 +36,7 @@ func New(signatureSuites ...SignatureSuite) *DocumentSigner {
 }
 
 // Sign  will sign JSON LD document.
+// Deprecated. Please use vc-go/verifiable.AddDIDLinkedDataProof().
 func (signer *DocumentSigner) Sign(
 	context *Context,
 	jsonLdDoc []byte,
