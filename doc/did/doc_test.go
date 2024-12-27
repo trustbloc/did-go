@@ -458,54 +458,69 @@ func TestInvalid(t *testing.T) {
 }
 
 func TestValidWithProof(t *testing.T) {
-	docs := []string{validDocWithProof, validDocV011WithProof}
-	for _, d := range docs {
-		doc, err := ParseDocument([]byte(d))
-		require.NoError(t, err)
-		require.NotNil(t, doc)
+	t.Run("Success", func(t *testing.T) {
+		docs := []string{validDocWithProof, validDocV011WithProof}
+		for _, d := range docs {
+			doc, err := ParseDocument([]byte(d))
+			require.NoError(t, err)
+			require.NotNil(t, doc)
 
-		// test proof
-		created, err := time.Parse(time.RFC3339, "2019-09-23T14:16:59.484733-04:00")
-		require.NoError(t, err)
+			// test proof
+			created, err := time.Parse(time.RFC3339, "2019-09-23T14:16:59.484733-04:00")
+			require.NoError(t, err)
+			expires, err := time.Parse(time.RFC3339, "2019-09-23T15:16:59.484733-04:00")
+			require.NoError(t, err)
 
-		const encProofValue = "6mdES87erjP5r1qCSRW__otj-A_Rj0YgRO7XU_0Amhwdfa7AAmtGUSFGflR_fZqPYrY9ceLRVQCJ49s0q7-LBA"
-		proofValue, err := base64.RawURLEncoding.DecodeString(encProofValue)
-		require.NoError(t, err)
+			const encProofValue = "6mdES87erjP5r1qCSRW__otj-A_Rj0YgRO7XU_0Amhwdfa7AAmtGUSFGflR_fZqPYrY9ceLRVQCJ49s0q7-LBA"
+			proofValue, err := base64.RawURLEncoding.DecodeString(encProofValue)
+			require.NoError(t, err)
 
-		nonce, err := base64.RawURLEncoding.DecodeString("")
-		require.NoError(t, err)
+			nonce, err := base64.RawURLEncoding.DecodeString("")
+			require.NoError(t, err)
 
-		eProof := Proof{
-			Type:               "Ed25519Signature2018",
-			Created:            &created,
-			Creator:            "did:method:abc#key-1",
-			ProofValue:         proofValue,
-			Domain:             "",
-			Nonce:              nonce,
-			ProofPurpose:       "assertionMethod",
-			CryptoSuite:        "cryptosuite1",
-			Challenge:          "challenge1",
-			VerificationMethod: "verificationMethod1",
-			JWS:                "jws1",
-			relativeURL:        false,
+			eProof := Proof{
+				Type:               "Ed25519Signature2018",
+				Created:            &created,
+				Expires:            &expires,
+				Creator:            "did:method:abc#key-1",
+				ProofValue:         proofValue,
+				Domain:             "",
+				Nonce:              nonce,
+				ProofPurpose:       "assertionMethod",
+				CryptoSuite:        "cryptosuite1",
+				Challenge:          "challenge1",
+				VerificationMethod: "verificationMethod1",
+				JWS:                "jws1",
+				relativeURL:        false,
+			}
+			require.Equal(t, []Proof{eProof}, doc.Proof)
+
+			byteDoc, err := doc.JSONBytes()
+			require.NoError(t, err)
+			require.NotNil(t, byteDoc)
 		}
-		require.Equal(t, []Proof{eProof}, doc.Proof)
+	})
 
-		byteDoc, err := doc.JSONBytes()
-		require.NoError(t, err)
-		require.NotNil(t, byteDoc)
-
-		// test invalid created
-		docWithInvalid := docWithInvalidCreatedInProof
-		if d == validDocV011WithProof {
-			docWithInvalid = docV011WithInvalidCreatedInProof
-		}
-
-		invalidDoc, err := ParseDocument([]byte(docWithInvalid))
+	t.Run("Invalid created", func(t *testing.T) {
+		invalid, err := ParseDocument([]byte(docWithInvalidCreatedInProof))
 		require.NotNil(t, err)
-		require.Nil(t, invalidDoc)
+		require.Nil(t, invalid)
 		require.Contains(t, err.Error(), "populate proofs failed")
-	}
+	})
+
+	t.Run("Invalid created V011", func(t *testing.T) {
+		invalid, err := ParseDocument([]byte(docV011WithInvalidCreatedInProof))
+		require.NotNil(t, err)
+		require.Nil(t, invalid)
+		require.Contains(t, err.Error(), "populate proofs failed")
+	})
+
+	t.Run("Invalid expires", func(t *testing.T) {
+		invalid, err := ParseDocument([]byte(docWithInvalidExpiresInProof))
+		require.NotNil(t, err)
+		require.Nil(t, invalid)
+		require.Contains(t, err.Error(), "populate proofs failed")
+	})
 }
 
 func TestInvalidEncodingInProof(t *testing.T) {
@@ -2009,6 +2024,7 @@ const validDocWithProof = `{
 	"id": "did:method:abc",
 	"proof": [{
 		"created": "2019-09-23T14:16:59.484733-04:00",
+		"expires": "2019-09-23T15:16:59.484733-04:00",
 		"creator": "did:method:abc#key-1",
 		"domain": "",
 		"nonce": "",
@@ -2069,6 +2085,7 @@ const validDocV011WithProof = `{
 	"id": "did:method:abc",
 	"proof": [{
 		"created": "2019-09-23T14:16:59.484733-04:00",
+        "expires": "2019-09-23T15:16:59.484733-04:00",
 		"creator": "did:method:abc#key-1",
 		"domain": "",
 		"nonce": "",
@@ -2095,6 +2112,21 @@ const docWithInvalidCreatedInProof = `{
 	"id": "did:method:abc",
 	"proof": [{
 		"created": "2019-9-23T14:16:59",
+		"creator": "did:method:abc#key-1",
+		"domain": "",
+		"nonce": "",
+		"proofValue": "6mdES87erjP5r1qCSRW__otj-A_Rj0YgRO7XU_0Amhwdfa7AAmtGUSFGflR_fZqPYrY9ceLRVQCJ49s0q7-LBA",
+		"type": "Ed25519Signature2018"
+	}]
+}`
+
+const docWithInvalidExpiresInProof = `{
+	"@context": ["https://w3id.org/did/v1"],
+	"created": "2019-09-23T14:16:59.261024-04:00",
+	"id": "did:method:abc",
+	"proof": [{
+		"created": "2019-09-23T14:16:59.484733-04:00",
+		"expires": "2019-9-23T14:16:59",
 		"creator": "did:method:abc#key-1",
 		"domain": "",
 		"nonce": "",
