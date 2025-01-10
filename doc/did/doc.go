@@ -12,9 +12,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
-	"log"
 	"net/url"
-	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -77,8 +75,6 @@ var (
 	schemaLoaderV011   = gojsonschema.NewStringLoader(schemaV011)   //nolint:gochecknoglobals
 	schemaLoaderV12019 = gojsonschema.NewStringLoader(schemaV12019) //nolint:gochecknoglobals
 )
-
-var logger = log.New(os.Stderr, " [did-go/did/doc] ", log.Ldate|log.Ltime|log.LUTC)
 
 // ErrDIDDocumentNotExist error did doc not exist.
 var ErrDIDDocumentNotExist = errors.New("did document not exists")
@@ -290,6 +286,7 @@ type Doc struct {
 	Updated              *time.Time
 	Proof                []Proof
 	processingMeta       processingMeta
+	warnings             []error
 }
 
 // processingMeta include info how to process the doc.
@@ -1221,7 +1218,7 @@ func (doc *Doc) JSONBytes() ([]byte, error) {
 		Context: doc.Context, ID: doc.ID, AlsoKnownAs: aka, VerificationMethod: vm,
 		Authentication: auths, AssertionMethod: assertionMethods, CapabilityDelegation: capabilityDelegations,
 		CapabilityInvocation: capabilityInvocations, KeyAgreement: keyAgreements,
-		Service: populateRawServices(doc.Service, doc.ID, doc.processingMeta.baseURI), Created: doc.Created,
+		Service: doc.populateRawServices(), Created: doc.Created,
 		Proof: populateRawProofs(context, doc.ID, doc.processingMeta.baseURI, doc.Proof), Updated: doc.Updated,
 	}
 
@@ -1347,6 +1344,12 @@ func (doc *Doc) VerificationMethods(customVerificationRelationships ...Verificat
 	return verificationMethods
 }
 
+// Warning returns warnings in format of error suitable for use with methods such as errors.Is or errors.As
+// returns nil if there were no warnings.
+func (doc *Doc) Warning() error {
+	return errors.Join(doc.warnings...)
+}
+
 // ErrProofNotFound is returned when proof is not found.
 var ErrProofNotFound = errors.New("proof not found")
 
@@ -1373,7 +1376,13 @@ func (r *didKeyResolver) Resolve(id string) (*api.PublicKey, error) {
 var ErrKeyNotFound = errors.New("key not found")
 
 // nolint:funlen,gocognit,gocyclo,nestif
-func populateRawServices(services []Service, didID, baseURI string) []map[string]interface{} {
+func (doc *Doc) populateRawServices() []map[string]interface{} {
+	var (
+		services = doc.Service
+		didID    = doc.ID
+		baseURI  = doc.processingMeta.baseURI
+	)
+
 	var rawServices []map[string]interface{}
 
 	for i := range services {
@@ -1412,12 +1421,14 @@ func populateRawServices(services []Service, didID, baseURI string) []map[string
 
 		sepAccept, err := services[i].ServiceEndpoint.Accept()
 		if err != nil {
-			logger.Printf("accept field of DIDComm V2 endpoint missing or invalid, it will be ignored: %v", err)
+			doc.warnings = append(doc.warnings,
+				fmt.Errorf("accept field of DIDComm V2 endpoint missing or invalid, it will be ignored: %w", err))
 		}
 
 		sepURI, err := services[i].ServiceEndpoint.URI()
 		if err != nil {
-			logger.Printf("URI field of DIDComm V2 endpoint missing or invalid, it will be ignored: %v", err)
+			doc.warnings = append(doc.warnings,
+				fmt.Errorf("URI field of DIDComm V2 endpoint missing or invalid, it will be ignored: %w", err))
 		}
 
 		if services[i].ServiceEndpoint.Type() == endpoint.DIDCommV2 {
@@ -1460,7 +1471,7 @@ func populateRawServices(services []Service, didID, baseURI string) []map[string
 		} else {
 			bytes, err := services[i].ServiceEndpoint.MarshalJSON()
 			if err != nil {
-				logger.Print(err.Error())
+				doc.warnings = append(doc.warnings, err)
 			}
 
 			rawService[jsonldServicePoint] = json.RawMessage(bytes)

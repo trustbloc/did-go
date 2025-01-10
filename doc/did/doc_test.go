@@ -1268,7 +1268,7 @@ func TestJSONConversion(t *testing.T) {
 		require.NotEmpty(t, doc2)
 
 		// verify documents created by ParseDocument and JSONBytes function matches
-		require.Equal(t, doc, doc2)
+		require.EqualExportedValues(t, doc, doc2)
 	}
 }
 
@@ -1300,7 +1300,7 @@ func TestMarshalJSON(t *testing.T) {
 		require.NotEmpty(t, doc2)
 
 		// verify documents created by ParseDocument and JSONBytes function matches
-		require.Equal(t, doc, doc2)
+		require.EqualExportedValues(t, doc, doc2)
 	}
 }
 
@@ -1311,6 +1311,30 @@ func TestUnmarshalJSON(t *testing.T) {
 
 		require.Error(t, err)
 	})
+}
+
+func TestDocWarning(t *testing.T) {
+	doc := &Doc{}
+	err := doc.UnmarshalJSON([]byte(validDoc))
+	require.NoError(t, err)
+	require.NotEmpty(t, doc)
+
+	_, err = doc.MarshalJSON()
+	require.NoError(t, err)
+
+	warning := doc.Warning()
+
+	for _, s := range doc.Service {
+		_, err := s.ServiceEndpoint.Accept()
+		if err != nil {
+			require.ErrorContains(t, warning, err.Error())
+		}
+
+		_, err = s.ServiceEndpoint.URI()
+		if err != nil {
+			require.ErrorContains(t, warning, err.Error())
+		}
+	}
 }
 
 func TestNewPublicKeyFromJWK(t *testing.T) {
