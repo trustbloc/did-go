@@ -50,6 +50,7 @@ const (
 
 	jsonldCreator            = "creator"
 	jsonldCreated            = "created"
+	jsonldExpires            = "expires"
 	jsonldProofValue         = "proofValue"
 	jsonldSignatureValue     = "signatureValue"
 	jsonldDomain             = "domain"
@@ -493,6 +494,7 @@ func (r *rawDoc) UnmarshalJSON(data []byte) error {
 type Proof struct {
 	Type               string
 	Created            *time.Time
+	Expires            *time.Time
 	Creator            string
 	ProofValue         []byte
 	Domain             string
@@ -632,7 +634,7 @@ func populateVerificationRelationships(doc *Doc, raw *rawDoc) error {
 	return nil
 }
 
-func populateProofs(context, didID, baseURI string, rawProofs []interface{}) ([]Proof, error) { // nolint:funlen
+func populateProofs(context, didID, baseURI string, rawProofs []interface{}) ([]Proof, error) { // nolint:funlen,gocyclo
 	proofs := make([]Proof, 0, len(rawProofs))
 
 	for _, rawProof := range rawProofs {
@@ -680,15 +682,22 @@ func populateProofs(context, didID, baseURI string, rawProofs []interface{}) ([]
 			relativeURL:        isRelative,
 		}
 
-		created := stringEntry(emap[jsonldCreated])
-		if created != "" {
+		if created := stringEntry(emap[jsonldCreated]); created != "" {
 			timeValue, errTime := time.Parse(time.RFC3339, created)
-
 			if errTime != nil {
 				return nil, errTime
 			}
 
 			proof.Created = &timeValue
+		}
+
+		if expires := stringEntry(emap[jsonldExpires]); expires != "" {
+			timeValue, errTime := time.Parse(time.RFC3339, expires)
+			if errTime != nil {
+				return nil, errTime
+			}
+
+			proof.Expires = &timeValue
 		}
 
 		proofs = append(proofs, proof)
@@ -1604,6 +1613,10 @@ func populateRawProofs(context, didID, baseURI string, proofs []Proof) []interfa
 
 		if p.VerificationMethod != "" {
 			rawProof[jsonldVerificationMethod] = p.VerificationMethod
+		}
+
+		if p.Expires != nil {
+			rawProof[jsonldExpires] = p.Expires
 		}
 
 		rawProofs = append(rawProofs, rawProof)
