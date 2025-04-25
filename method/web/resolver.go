@@ -7,6 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 package web
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -43,7 +44,7 @@ func (v *VDR) Read(didID string, opts ...vdrapi.DIDMethodOption) (*did.DocResolu
 		httpClient, ok = k.(*http.Client)
 
 		if !ok {
-			return nil, fmt.Errorf("failed to cast http client opt to http client struct")
+			return nil, errors.New("failed to cast http client opt to http client struct")
 		}
 	}
 

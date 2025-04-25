@@ -9,6 +9,7 @@ package key
 import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
+	"errors"
 	"fmt"
 	"regexp"
 
@@ -61,7 +62,7 @@ func createDIDDocFromPubKey(kid string, code uint64, pubKeyBytes []byte) (*did.D
 }
 
 func createBase58DIDDoc(kid, keyType string, pubKeyBytes []byte) (*did.Doc, error) {
-	didKey := fmt.Sprintf("did:key:%s", kid)
+	didKey := fmt.Sprintf("did:key:%s", kid) //nolint:perfsprint
 
 	keyID := fmt.Sprintf("%s#%s", didKey, kid)
 	publicKey := did.NewVerificationMethodFromBytes(keyID, keyType, didKey, pubKeyBytes)
@@ -72,7 +73,7 @@ func createBase58DIDDoc(kid, keyType string, pubKeyBytes []byte) (*did.Doc, erro
 }
 
 func createJSONWebKey2020DIDDoc(kid string, code uint64, pubKeyBytes []byte) (*did.Doc, error) {
-	didKey := fmt.Sprintf("did:key:%s", kid)
+	didKey := fmt.Sprintf("did:key:%s", kid) //nolint:perfsprint
 
 	keyID := fmt.Sprintf("%s#%s", didKey, kid)
 
@@ -91,7 +92,7 @@ func createJSONWebKey2020DIDDoc(kid string, code uint64, pubKeyBytes []byte) (*d
 
 	x, y := elliptic.UnmarshalCompressed(curve, pubKeyBytes)
 	if x == nil {
-		return nil, fmt.Errorf("error unmarshalling key bytes")
+		return nil, errors.New("error unmarshalling key bytes")
 	}
 
 	publicKey := ecdsa.PublicKey{
@@ -116,7 +117,7 @@ func createJSONWebKey2020DIDDoc(kid string, code uint64, pubKeyBytes []byte) (*d
 }
 
 func createEd25519DIDDoc(kid string, pubKeyBytes []byte, verificationKeyType string) (*did.Doc, error) {
-	didKey := fmt.Sprintf("did:key:%s", kid)
+	didKey := fmt.Sprintf("did:key:%s", kid) //nolint:perfsprint
 
 	// did:key can't add non converted encryption key as keyAgreement (unless it's added as an option just like creator,
 	// it can be added and read here if needed. Below TODO is a reminder for this)

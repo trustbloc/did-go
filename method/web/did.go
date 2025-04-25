@@ -7,6 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 package web
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
 	"strings"
@@ -32,7 +33,7 @@ func parseDIDWeb(id string, useHTTP bool) (string, string, error) {
 
 	pathComponents[0], err = url.QueryUnescape(pathComponents[0])
 	if err != nil {
-		return address, host, fmt.Errorf("error parsing did:web did")
+		return address, host, errors.New("error parsing did:web did")
 	}
 
 	host = strings.Split(pathComponents[0], ":")[0]

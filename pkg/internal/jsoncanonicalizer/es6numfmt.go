@@ -32,6 +32,7 @@ import (
 
 const invalidPattern uint64 = 0x7ff0000000000000
 
+//nolint:funlen,gocyclo,nestif
 func NumberToJSON(ieeeF64 float64) (res string, err error) {
 	ieeeU64 := math.Float64bits(ieeeF64)
 
@@ -47,6 +48,7 @@ func NumberToJSON(ieeeF64 float64) (res string, err error) {
 
 	// Deal with the sign separately
 	var sign string = ""
+
 	if ieeeF64 < 0 {
 		ieeeF64 = -ieeeF64
 		sign = "-"
@@ -80,6 +82,7 @@ func NumberToJSON(ieeeF64 float64) (res string, err error) {
 		for es6Formatted[i-1] == '0' {
 			i--
 		}
+
 		if i != len(es6Formatted) {
 			fix := strconv.FormatFloat(ieeeF64, 'f', 0, 64)
 			if fix[i] >= '5' {
@@ -90,5 +93,6 @@ func NumberToJSON(ieeeF64 float64) (res string, err error) {
 			}
 		}
 	}
+
 	return sign + es6Formatted, nil
 }

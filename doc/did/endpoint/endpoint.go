@@ -8,6 +8,7 @@ package endpoint
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/url"
 )
@@ -113,7 +114,7 @@ func (s *Endpoint) URI() (string, error) {
 		}
 	}
 
-	return "", fmt.Errorf("endpoint URI not found")
+	return "", errors.New("endpoint URI not found")
 }
 
 // Accept is the DIDComm V2 Accept field of a service endpoint.
@@ -123,7 +124,7 @@ func (s *Endpoint) Accept() ([]string, error) {
 		return s.rawDIDCommV2[0].Accept, nil
 	}
 
-	return nil, fmt.Errorf("endpoint Accept not found")
+	return nil, errors.New("endpoint Accept not found")
 }
 
 // RoutingKeys is the DIDComm V2 RoutingKeys field of a service endpoint.
@@ -133,7 +134,7 @@ func (s *Endpoint) RoutingKeys() ([]string, error) {
 		return s.rawDIDCommV2[0].RoutingKeys, nil
 	}
 
-	return nil, fmt.Errorf("endpoint RoutingKeys not found")
+	return nil, errors.New("endpoint RoutingKeys not found")
 }
 
 // Type return endpoint type.
@@ -197,7 +198,7 @@ func (s *Endpoint) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 
-	return fmt.Errorf("endpoint data is not supported")
+	return errors.New("endpoint data is not supported")
 }
 
 func isURL(str string) bool {

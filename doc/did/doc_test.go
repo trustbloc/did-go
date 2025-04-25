@@ -55,7 +55,6 @@ const (
 	wrongDataMsg    = "wrongData"
 )
 
-//nolint:gochecknoglobals
 var (
 	//go:embed testdata/valid_doc.jsonld
 	validDoc string

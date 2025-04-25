@@ -518,9 +518,9 @@ func BenchmarkGetCanonicalDocument(b *testing.B) {
 var MajorSink string
 
 //go:embed testdata/contexts/extra_jsonld_context.jsonld
-var extraJSONLDContext []byte //nolint:gochecknoglobals // embedded extra test context
+var extraJSONLDContext []byte // embedded extra test context
 
-// nolint:gochecknoglobals // embedded test data
+// embedded test data.
 var (
 	//go:embed testdata/canonized_incorrect_rdf.nq
 	canonizedIncorrectRDF string

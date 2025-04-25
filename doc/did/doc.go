@@ -118,7 +118,7 @@ func Parse(did string) (*DID, error) {
 }
 
 // DIDURL holds a DID URL.
-type DIDURL struct { // nolint:golint // ignore name stutter
+type DIDURL struct { //nolint:golint // ignore name stutter
 	DID
 	Path     string
 	Queries  map[string][]string
@@ -752,6 +752,7 @@ func populateServices(didID, baseURI string, rawServices []map[string]interface{
 						})
 					}
 				}
+
 				coreServices, ok := epEntry.(map[string]interface{}) // DID Core
 				if ok && len(coreServices) > 0 {
 					sp = endpoint.NewDIDCoreEndpoint(coreServices)
@@ -897,7 +898,7 @@ func resolveRelativeDIDURL(didID, baseURI string, keyID interface{}) string {
 		id = didID
 	}
 
-	return id + keyID.(string)
+	return id + keyID.(string) //nolint:errcheck
 }
 
 func makeRelativeDIDURL(didURL, baseURI, didID string) string {
@@ -1287,7 +1288,8 @@ func (doc *Doc) VerifyProof(suites []api.VerifierSuite, opts ...processor.Opts) 
 // If customVerificationRelationships is empty, all verification methods are returned.
 // Public keys which are not referred by any verification method are put into special VerificationRelationshipGeneral
 // relationship category.
-// nolint:gocyclo
+//
+//nolint:gocyclo
 func (doc *Doc) VerificationMethods(customVerificationRelationships ...VerificationRelationship) map[VerificationRelationship][]Verification { //nolint:lll
 	all := len(customVerificationRelationships) == 0
 
@@ -1375,7 +1377,7 @@ func (r *didKeyResolver) Resolve(id string) (*api.PublicKey, error) {
 // ErrKeyNotFound is returned when key is not found.
 var ErrKeyNotFound = errors.New("key not found")
 
-// nolint:funlen,gocognit,gocyclo,nestif
+//nolint:funlen,gocognit,gocyclo,nestif
 func (doc *Doc) populateRawServices() []map[string]interface{} {
 	var (
 		services = doc.Service
