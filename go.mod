@@ -4,12 +4,14 @@
 
 module github.com/trustbloc/did-go
 
-go 1.22
+go 1.23.0
+
+toolchain go1.23.6
 
 require (
 	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
 	github.com/cenkalti/backoff/v4 v4.3.0
-	github.com/go-jose/go-jose/v3 v3.0.3
+	github.com/go-jose/go-jose/v3 v3.0.4
 	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.6.0
 	github.com/mitchellh/mapstructure v1.5.0
@@ -42,8 +44,8 @@ require (
 	github.com/trustbloc/bbs-signature-go v1.0.2 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
-	golang.org/x/crypto v0.29.0 // indirect
-	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/crypto v0.37.0 // indirect
+	golang.org/x/sys v0.32.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	rsc.io/tmplfunc v0.0.3 // indirect
 )
