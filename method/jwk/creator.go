@@ -8,6 +8,7 @@ package jwk
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 
 	"github.com/trustbloc/did-go/pkg/canonicalizer"
@@ -21,11 +22,11 @@ import (
 func (v *VDR) Create(didDoc *did.Doc, opts ...vdrapi.DIDMethodOption) (*did.DocResolution, error) {
 	// make sure there is one verification method
 	if len(didDoc.VerificationMethod) == 0 {
-		return nil, fmt.Errorf("missing verification method")
+		return nil, errors.New("missing verification method")
 	}
 
 	if len(didDoc.VerificationMethod) > 1 {
-		return nil, fmt.Errorf("found more than one verification method")
+		return nil, errors.New("found more than one verification method")
 	}
 
 	if didDoc.VerificationMethod[0].Type != jsonWebKey2020 {
@@ -44,7 +45,7 @@ func (v *VDR) Create(didDoc *did.Doc, opts ...vdrapi.DIDMethodOption) (*did.DocR
 
 func createDID(key *jwk.JWK) (string, error) {
 	if key == nil {
-		return "", fmt.Errorf("missing JWK")
+		return "", errors.New("missing JWK")
 	}
 
 	keyBytes, err := key.MarshalJSON()

@@ -7,6 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 package key
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -31,7 +32,8 @@ const (
 // Create new DID document for didDoc.
 // Either didDoc must contain non-empty VerificationMethod[] or opts must contain KeyType value of kms.KeyType to create
 // a new key and a corresponding *VerificationMethod entry.
-// nolint:gocyclo
+//
+//nolint:gocyclo
 func (v *VDR) Create(didDoc *did.Doc, opts ...vdrapi.DIDMethodOption) (*did.DocResolution, error) {
 	createDIDOpts := &vdrapi.DIDMethodOpts{Values: make(map[string]interface{})}
 	// Apply options
@@ -48,7 +50,7 @@ func (v *VDR) Create(didDoc *did.Doc, opts ...vdrapi.DIDMethodOption) (*did.DocR
 	)
 
 	if len(didDoc.VerificationMethod) == 0 {
-		return nil, fmt.Errorf("verification method is empty")
+		return nil, errors.New("verification method is empty")
 	}
 
 	verificationMethodType := didDoc.VerificationMethod[0].Type
@@ -87,7 +89,7 @@ func (v *VDR) Create(didDoc *did.Doc, opts ...vdrapi.DIDMethodOption) (*did.DocR
 		keyAgr, ok = k.(*did.VerificationMethod)
 
 		if !ok {
-			return nil, fmt.Errorf("encryptionKey not VerificationMethod")
+			return nil, errors.New("encryptionKey not VerificationMethod")
 		}
 	}
 

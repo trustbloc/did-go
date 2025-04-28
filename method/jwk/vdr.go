@@ -8,7 +8,7 @@ SPDX-License-Identifier: Apache-2.0
 package jwk
 
 import (
-	"fmt"
+	"errors"
 
 	diddoc "github.com/trustbloc/did-go/doc/did"
 	vdrapi "github.com/trustbloc/did-go/vdr/api"
@@ -39,10 +39,10 @@ func (v *VDR) Close() error {
 
 // Update did doc.
 func (v *VDR) Update(didDoc *diddoc.Doc, opts ...vdrapi.DIDMethodOption) error {
-	return fmt.Errorf("not supported")
+	return errors.New("not supported")
 }
 
 // Deactivate did doc.
 func (v *VDR) Deactivate(didID string, opts ...vdrapi.DIDMethodOption) error {
-	return fmt.Errorf("not supported")
+	return errors.New("not supported")
 }

@@ -64,14 +64,14 @@ func (v *VDR) resolveDID(uri string) ([]byte, error) {
 		return nil, fmt.Errorf("reading response body failed: %w", err)
 	}
 
-	if resp.StatusCode == http.StatusOK && strings.Contains(resp.Header.Get("Content-type"), didLDJson) {
+	if resp.StatusCode == http.StatusOK && strings.Contains(resp.Header.Get("Content-Type"), didLDJson) {
 		return gotBody, nil
 	} else if resp.StatusCode == http.StatusNotFound {
 		return nil, vdrapi.ErrNotFound
 	}
 
 	return nil, fmt.Errorf("unsupported response from DID resolver [%v] header [%s] body [%s]",
-		resp.StatusCode, resp.Header.Get("Content-type"), gotBody)
+		resp.StatusCode, resp.Header.Get("Content-Type"), gotBody)
 }
 
 // Read implements didresolver.DidMethod.Read interface (https://w3c-ccg.github.io/did-resolution/#resolving-input)
@@ -91,7 +91,7 @@ func (v *VDR) Read(didID string, opts ...vdrapi.DIDMethodOption) (*did.DocResolu
 
 		versionID, ok = didMethodOpts.Values[VersionIDOpt].(string)
 		if !ok {
-			return nil, fmt.Errorf("versionIDOpt is not string")
+			return nil, errors.New("versionIDOpt is not string")
 		}
 	}
 
@@ -100,12 +100,12 @@ func (v *VDR) Read(didID string, opts ...vdrapi.DIDMethodOption) (*did.DocResolu
 
 		versionTime, ok = didMethodOpts.Values[VersionTimeOpt].(string)
 		if !ok {
-			return nil, fmt.Errorf("versionIDOpt is not string")
+			return nil, errors.New("versionIDOpt is not string")
 		}
 	}
 
 	if versionID != "" && versionTime != "" {
-		return nil, fmt.Errorf("versionID and versionTime can not set at same time")
+		return nil, errors.New("versionID and versionTime can not set at same time")
 	}
 
 	reqURL, err := url.ParseRequestURI(v.endpointURL)
@@ -116,11 +116,11 @@ func (v *VDR) Read(didID string, opts ...vdrapi.DIDMethodOption) (*did.DocResolu
 	reqURL.Path = path.Join(reqURL.Path, didID)
 
 	if versionID != "" {
-		reqURL.RawQuery = fmt.Sprintf("versionId=%s", versionID)
+		reqURL.RawQuery = fmt.Sprintf("versionId=%s", versionID) //nolint:perfsprint
 	}
 
 	if versionTime != "" {
-		reqURL.RawQuery = fmt.Sprintf("versionTime=%s", versionTime)
+		reqURL.RawQuery = fmt.Sprintf("versionTime=%s", versionTime) //nolint:perfsprint
 	}
 
 	data, err := v.resolveDID(reqURL.String())

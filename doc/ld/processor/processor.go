@@ -141,7 +141,7 @@ func (p *Processor) GetCanonicalDocument(doc map[string]interface{}, opts ...Opt
 
 	result, ok := view.(string)
 	if !ok {
-		return nil, fmt.Errorf("failed to normalize JSON-LD document, invalid view")
+		return nil, errors.New("failed to normalize JSON-LD document, invalid view")
 	}
 
 	result, err = p.removeMatchingInvalidRDFs(result, procOptions)
@@ -237,7 +237,7 @@ func (p *Processor) Frame(inputDoc map[string]interface{}, frameDoc map[string]i
 	hasBlankBaseID := false
 	if checkID, ok := inputDoc["id"]; !ok || checkID == "" {
 		hasBlankBaseID = true
-		inputDoc["id"] = fmt.Sprintf("urn:uuid:%s", uuid.New().String())
+		inputDoc["id"] = fmt.Sprintf("urn:uuid:%s", uuid.New().String()) //nolint:perfsprint
 		frameDoc["id"] = inputDoc["id"]
 	}
 
@@ -299,7 +299,7 @@ func removeDuplicateIDs(inputDoc map[string]interface{}, proc *ld.JsonLdProcesso
 				return "", false
 			}
 
-			randomID := fmt.Sprintf("urn:uuid:%s", uuid.New().String())
+			randomID := fmt.Sprintf("urn:uuid:%s", uuid.New().String()) //nolint:perfsprint
 			randomIds[randomID] = id
 
 			return randomID, true
@@ -439,7 +439,7 @@ func (p *Processor) normalizeFilteredDataset(view string) (string, error) {
 		return "", err
 	}
 
-	return result.(string), nil
+	return result.(string), nil //nolint:errcheck
 }
 
 func fromRDF(docStatements []string, context interface{},

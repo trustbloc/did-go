@@ -7,7 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 package web
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/trustbloc/did-go/doc/did"
 	vdrapi "github.com/trustbloc/did-go/vdr/api"
@@ -15,5 +15,5 @@ import (
 
 // Create creates a did:web diddoc (unsupported at the moment).
 func (v *VDR) Create(didDoc *did.Doc, opts ...vdrapi.DIDMethodOption) (*did.DocResolution, error) {
-	return nil, fmt.Errorf("error building did:web did doc --> build not supported in http binding vdr")
+	return nil, errors.New("error building did:web did doc --> build not supported in http binding vdr")
 }

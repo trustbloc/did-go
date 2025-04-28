@@ -44,6 +44,7 @@ func (v *VDR) Read(didJWK string, _ ...vdrapi.DIDMethodOption) (*did.DocResoluti
 }
 
 func createJWKResolutionResult(didJWK string, key *jwk.JWK) (*did.DocResolution, error) {
+	//nolint:perfsprint
 	vm, err := did.NewVerificationMethodFromJWK(fmt.Sprintf("%s#0", didJWK), jsonWebKey2020, didJWK, key)
 	if err != nil {
 		return nil, fmt.Errorf("generate resolution result: error creating verification method: %w", err)

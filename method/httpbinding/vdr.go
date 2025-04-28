@@ -7,6 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 package httpbinding
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -63,7 +64,7 @@ func (v *VDR) Accept(method string, opts ...vdrapi.DIDMethodOption) bool {
 
 // Create did doc.
 func (v *VDR) Create(didDoc *did.Doc, opts ...vdrapi.DIDMethodOption) (*did.DocResolution, error) {
-	return nil, fmt.Errorf("build not supported in http binding vdr")
+	return nil, errors.New("build not supported in http binding vdr")
 }
 
 // Close frees resources being maintained by vdr.
@@ -73,12 +74,12 @@ func (v *VDR) Close() error {
 
 // Update did doc.
 func (v *VDR) Update(didDoc *did.Doc, opts ...vdrapi.DIDMethodOption) error {
-	return fmt.Errorf("not supported")
+	return errors.New("not supported")
 }
 
 // Deactivate did doc.
 func (v *VDR) Deactivate(didID string, opts ...vdrapi.DIDMethodOption) error {
-	return fmt.Errorf("not supported")
+	return errors.New("not supported")
 }
 
 // Option configures the peer vdr.

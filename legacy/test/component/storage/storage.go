@@ -3761,7 +3761,7 @@ func randomStoreName() string {
 }
 
 func putData(t *testing.T, store spi.Store, keys []string, values [][]byte, tags [][]spi.Tag) {
-	for i := 0; i < len(keys); i++ {
+	for i := range keys {
 		err := store.Put(keys[i], values[i], tags[i]...)
 		require.NoError(t, err)
 	}
@@ -3831,7 +3831,7 @@ func verifyIteratorAnyOrder(t *testing.T, actualResultsItr spi.Iterator, //nolin
 		receivedTags, itrErr := actualResultsItr.Tags()
 		require.NoError(t, itrErr)
 
-		for i := 0; i < len(dataChecklist.keys); i++ {
+		for i := range dataChecklist.keys {
 			if receivedKey == dataChecklist.keys[i] {
 				if string(receivedValue) == string(dataChecklist.values[i]) {
 					if equalTags(receivedTags, dataChecklist.tags[i]) {

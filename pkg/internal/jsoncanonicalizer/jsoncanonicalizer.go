@@ -36,13 +36,14 @@ type nameValueType struct {
 	value   string
 }
 
-// JSON standard escapes (modulo \u)
-var asciiEscapes = []byte{'\\', '"', 'b', 'f', 'n', 'r', 't'}
-var binaryEscapes = []byte{'\\', '"', '\b', '\f', '\n', '\r', '\t'}
+// JSON standard escapes (modulo \u).
+var asciiEscapes = []byte{'\\', '"', 'b', 'f', 'n', 'r', 't'}       //nolint:gochecknoglobals
+var binaryEscapes = []byte{'\\', '"', '\b', '\f', '\n', '\r', '\t'} //nolint:gochecknoglobals
 
-// JSON literals
-var literals = []string{"true", "false", "null"}
+// JSON literals.
+var literals = []string{"true", "false", "null"} //nolint:gochecknoglobals
 
+//nolint:funlen,gocyclo,nestif
 func Transform(jsonData []byte) (result []byte, e error) {
 	// JSON data MUST be UTF-8 encoded
 	var jsonDataLength int = len(jsonData)
@@ -51,11 +52,13 @@ func Transform(jsonData []byte) (result []byte, e error) {
 	var index int = 0
 
 	// "Forward" declarations are needed for closures referring each other
-	var parseElement func() string
-	var parseSimpleType func() string
-	var parseQuotedString func() string
-	var parseObject func() string
-	var parseArray func() string
+	var (
+		parseElement      func() string
+		parseSimpleType   func() string
+		parseQuotedString func() string
+		parseObject       func() string
+		parseArray        func() string
+	)
 
 	var globalError error = nil
 
@@ -80,10 +83,14 @@ func Transform(jsonData []byte) (result []byte, e error) {
 			if c > 0x7f {
 				setError("Unexpected non-ASCII character")
 			}
+
 			index++
+
 			return c
 		}
+
 		setError("Unexpected EOF reached")
+
 		return '"'
 	}
 
@@ -93,6 +100,7 @@ func Transform(jsonData []byte) (result []byte, e error) {
 			if isWhiteSpace(c) {
 				continue
 			}
+
 			return c
 		}
 	}
@@ -106,15 +114,19 @@ func Transform(jsonData []byte) (result []byte, e error) {
 
 	getUEscape := func() rune {
 		start := index
+
 		nextChar()
 		nextChar()
 		nextChar()
 		nextChar()
+
 		if globalError != nil {
 			return 0
 		}
+
 		u16, err := strconv.ParseUint(string(jsonData[start:index]), 16, 64)
 		checkError(err)
+
 		return rune(u16)
 	}
 
@@ -122,11 +134,13 @@ func Transform(jsonData []byte) (result []byte, e error) {
 		save := index
 		c := scan()
 		index = save
+
 		return c
 	}
 
 	decorateString := func(rawUTF8 string) string {
 		var quotedString strings.Builder
+
 		quotedString.WriteByte('"')
 	CoreLoop:
 		for _, c := range []byte(rawUTF8) {
@@ -145,7 +159,9 @@ func Transform(jsonData []byte) (result []byte, e error) {
 				quotedString.WriteByte(c)
 			}
 		}
+
 		quotedString.WriteByte('"')
+
 		return quotedString.String()
 	}
 
@@ -207,26 +223,33 @@ func Transform(jsonData []byte) (result []byte, e error) {
 				rawString.WriteByte(c)
 			}
 		}
+
 		return rawString.String()
 	}
 
 	parseSimpleType = func() string {
 		var token strings.Builder
+
 		index--
+
 		for globalError == nil {
 			c := testNextNonWhiteSpaceChar()
 			if c == ',' || c == ']' || c == '}' {
 				break
 			}
+
 			c = nextChar()
 			if isWhiteSpace(c) {
 				break
 			}
+
 			token.WriteByte(c)
 		}
+
 		if token.Len() == 0 {
 			setError("Missing argument")
 		}
+
 		value := token.String()
 		// Is it a JSON literal?
 		for _, literal := range literals {
@@ -237,8 +260,10 @@ func Transform(jsonData []byte) (result []byte, e error) {
 		// Apparently not so we assume that it is a I-JSON number
 		ieeeF64, err := strconv.ParseFloat(value, 64)
 		checkError(err)
+
 		value, err = NumberToJSON(ieeeF64)
 		checkError(err)
+
 		return value
 	}
 
@@ -257,7 +282,9 @@ func Transform(jsonData []byte) (result []byte, e error) {
 
 	parseArray = func() string {
 		var arrayData strings.Builder
+
 		arrayData.WriteByte('[')
+
 		var next bool = false
 		for globalError == nil && testNextNonWhiteSpaceChar() != ']' {
 			if next {
@@ -266,21 +293,27 @@ func Transform(jsonData []byte) (result []byte, e error) {
 			} else {
 				next = true
 			}
+
 			arrayData.WriteString(parseElement())
 		}
+
 		scan()
+
 		arrayData.WriteByte(']')
+
 		return arrayData.String()
 	}
 
 	lexicographicallyPrecedes := func(sortKey []uint16, e *list.Element) bool {
 		// Find the minimum length of the sortKeys
-		oldSortKey := e.Value.(nameValueType).sortKey
+		oldSortKey := e.Value.(nameValueType).sortKey //nolint:errcheck
+
 		minLength := len(oldSortKey)
 		if minLength > len(sortKey) {
 			minLength = len(sortKey)
 		}
-		for q := 0; q < minLength; q++ {
+
+		for q := range minLength {
 			diff := int(sortKey[q]) - int(oldSortKey[q])
 			if diff < 0 {
 				// Smaller => Precedes
@@ -290,14 +323,16 @@ func Transform(jsonData []byte) (result []byte, e error) {
 				return false
 			}
 			// Still equal => Continue
-		}
+		} //nolint:wsl
+
 		// The sortKeys compared equal up to minLength
 		if len(sortKey) < len(oldSortKey) {
 			// Shorter => Precedes
 			return true
 		}
+
 		if len(sortKey) == len(oldSortKey) {
-			setError("Duplicate key: " + e.Value.(nameValueType).name)
+			setError("Duplicate key: " + e.Value.(nameValueType).name) //nolint:errcheck
 		}
 		// Longer => No match
 		return false
@@ -305,7 +340,9 @@ func Transform(jsonData []byte) (result []byte, e error) {
 
 	parseObject = func() string {
 		nameValueList := list.New()
+
 		var next bool = false
+
 	CoreLoop:
 		for globalError == nil && testNextNonWhiteSpaceChar() != '}' {
 			if next {
@@ -340,19 +377,24 @@ func Transform(jsonData []byte) (result []byte, e error) {
 		scan()
 		// Now everything is sorted so we can properly serialize the object
 		var objectData strings.Builder
+
 		objectData.WriteByte('{')
+
 		next = false
 		for e := nameValueList.Front(); e != nil; e = e.Next() {
 			if next {
 				objectData.WriteByte(',')
 			}
+
 			next = true
-			nameValue := e.Value.(nameValueType)
+			nameValue := e.Value.(nameValueType) //nolint:errcheck
 			objectData.WriteString(decorateString(nameValue.name))
 			objectData.WriteByte(':')
 			objectData.WriteString(nameValue.value)
 		}
+
 		objectData.WriteByte('}')
+
 		return objectData.String()
 	}
 
@@ -363,17 +405,22 @@ func Transform(jsonData []byte) (result []byte, e error) {
 
 	if testNextNonWhiteSpaceChar() == '[' {
 		scan()
+
 		transformed = parseArray()
 	} else {
 		scanFor('{')
+
 		transformed = parseObject()
 	}
+
 	for index < jsonDataLength {
 		if !isWhiteSpace(jsonData[index]) {
 			setError("Improperly terminated JSON object")
 			break
 		}
+
 		index++
 	}
+
 	return []byte(transformed), globalError
 }

@@ -67,7 +67,7 @@ func TestNew(t *testing.T) {
 		i := 0
 		_, err := New("https://uniresolver.io/",
 			func(opts *VDR) {
-				i += 1 // nolint
+				i += 1 //nolint
 			},
 			func(opts *VDR) {
 				i += 2
@@ -95,7 +95,7 @@ func TestRead_DIDDoc(t *testing.T) {
 	t.Run("test success return did doc", func(t *testing.T) {
 		testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 			require.Equal(t, "/did:example:334455", req.URL.String())
-			res.Header().Add("Content-type", "application/did+ld+json")
+			res.Header().Add("Content-Type", "application/did+ld+json")
 			res.WriteHeader(http.StatusOK)
 			_, err := res.Write([]byte(doc))
 			require.NoError(t, err)
@@ -115,7 +115,7 @@ func TestRead_DIDDoc(t *testing.T) {
 	t.Run("test success return did resolution", func(t *testing.T) {
 		testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 			require.Equal(t, "/did:example:334455", req.URL.String())
-			res.Header().Add("Content-type", "application/did+ld+json")
+			res.Header().Add("Content-Type", "application/did+ld+json")
 			res.WriteHeader(http.StatusOK)
 			_, err := res.Write([]byte(didResolutionData))
 			require.NoError(t, err)
@@ -135,7 +135,7 @@ func TestRead_DIDDoc(t *testing.T) {
 	t.Run("test success version id", func(t *testing.T) {
 		testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 			require.Equal(t, "/did:example:334455?versionId=v1", req.URL.String())
-			res.Header().Add("Content-type", "application/did+ld+json")
+			res.Header().Add("Content-Type", "application/did+ld+json")
 			res.WriteHeader(http.StatusOK)
 			_, err := res.Write([]byte(didResolutionData))
 			require.NoError(t, err)
@@ -165,7 +165,7 @@ func TestRead_DIDDoc(t *testing.T) {
 	t.Run("test success version time", func(t *testing.T) {
 		testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 			require.Equal(t, "/did:example:334455?versionTime=2021-05-10T17:00:00Z", req.URL.String())
-			res.Header().Add("Content-type", "application/did+ld+json")
+			res.Header().Add("Content-Type", "application/did+ld+json")
 			res.WriteHeader(http.StatusOK)
 			_, err := res.Write([]byte(didResolutionData))
 			require.NoError(t, err)
@@ -186,7 +186,7 @@ func TestRead_DIDDoc(t *testing.T) {
 	t.Run("test empty doc", func(t *testing.T) {
 		testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 			require.Equal(t, "/did:example:334455", req.URL.String())
-			res.Header().Add("Content-type", "application/did+ld+json")
+			res.Header().Add("Content-Type", "application/did+ld+json")
 			res.WriteHeader(http.StatusOK)
 			_, err := res.Write(nil)
 			require.NoError(t, err)
@@ -205,7 +205,7 @@ func TestRead_DIDDoc(t *testing.T) {
 func TestRead_DIDDocWithBasePath(t *testing.T) {
 	testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 		require.Equal(t, "/document/did:example:334455", req.URL.String())
-		res.Header().Add("Content-type", "application/did+ld+json")
+		res.Header().Add("Content-Type", "application/did+ld+json")
 		res.WriteHeader(http.StatusOK)
 		_, err := res.Write([]byte(doc))
 		require.NoError(t, err)
@@ -225,7 +225,7 @@ func TestRead_DIDDocWithBasePath(t *testing.T) {
 func TestRead_DIDDocWithBasePathWithSlashes(t *testing.T) {
 	testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 		require.Equal(t, "/document/did:example:334455", req.URL.String())
-		res.Header().Add("Content-type", "application/did+ld+json")
+		res.Header().Add("Content-Type", "application/did+ld+json")
 		res.WriteHeader(http.StatusOK)
 		_, err := res.Write([]byte(doc))
 		require.NoError(t, err)
