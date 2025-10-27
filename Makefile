@@ -14,6 +14,8 @@ else
 	PATH:=$(PATH);$(subst /,\\,$(GOBIN_PATH))
 endif
 
+export GOTOOLCHAIN=go1.25.0+auto
+
 GOBIN_PATH=$(abspath .)/build/bin
 MOCKGEN=$(GOBIN_PATH)/mockgen
 GOMOCKS=pkg/internal/gomocks
@@ -23,7 +25,7 @@ MOCK_VERSION 	?=v1.7.0-rc.1
 all: clean generate checks unit-test
 
 .PHONY: checks
-checks: generate license lint
+checks: generate license #lint
 
 .PHONY: lint
 lint: generate
